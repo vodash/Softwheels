@@ -10,6 +10,7 @@ import {MenuComponent} from './menu/menu.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ChartComponent} from './chart/chart.component';
 import {HighchartsChartComponent} from 'highcharts-angular';
+import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import {HighchartsChartComponent} from 'highcharts-angular';
         LoginComponent,
         MenuComponent,
 		ChartComponent,
-		HighchartsChartComponent
+		HighchartsChartComponent,
+		DoctorProfileComponent
     ],
     imports: [
         BrowserModule,
