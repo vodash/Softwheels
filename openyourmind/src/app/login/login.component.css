@@ -1,18 +1,18 @@
-.wrapper{
-  background: #bdbdbd;
-  height: 100vh;
+.wrapper {
+    background: #bdbdbd;
+    height: 100vh;
 }
 
-.whitetext{
-  color: #fff;
+.whitetext {
+    color: #fff;
 }
 
-.formmarg{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-height: 100vh;
+.formmarg {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
 }
 

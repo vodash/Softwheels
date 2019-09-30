@@ -1,13 +1,15 @@
 <div class="wrapper">
-  <div class="container">
-      <form class="text-center formmarg">
-          <div class=" col-md-8 col-offset-2">
-            <h1 class="whitetext">Log in</h1>
-            <input type="email" formControlName="email" id="defaultRegisterFormEmail" class="form-control mb-4 logform" placeholder="E-mail">
-            <input type="password" formControlName="password" class="form-control logform" placeholder="Password">
-            <button class="btn logbtn btn-info my-4 btn-block" type="submit">Login</button>
-            <p class="noaccount"> <a routerLink="../registration"> Sign up here! </a></p>
-          </div>
-      </form>
-  </div>
+    <div class="container">
+        <form class="text-center formmarg">
+            <div class=" col-md-8 col-offset-2">
+                <h1 class="whitetext">Log in</h1>
+                <input class="form-control mb-4 logform" formControlName="email" id="defaultRegisterFormEmail"
+                       placeholder="E-mail"
+                       type="email">
+                <input class="form-control logform" formControlName="password" placeholder="Password" type="password">
+                <button class="btn logbtn btn-info my-4 btn-block" type="submit">Login</button>
+                <p class="noaccount"><a routerLink="../registration"> Sign up here! </a></p>
+            </div>
+        </form>
+    </div>
 </div>
