@@ -1,12 +1,12 @@
 <!--This file holds all the content you want to show on every page. so : Menu button and banner. This also needs to import the router-outlet - kevin-->
 
 <button (click)="toggleMenu()" class="openmenu">
-  <div class="bar1"></div>
-  <div class="bar2"></div>
-  <div class="bar3"></div>
+    <div class="bar1"></div>
+    <div class="bar2"></div>
+    <div class="bar3"></div>
 </button>
 
-<app-menu [@slideInOut]="menuState" (closeEvent)="forceCloseMenu()"></app-menu>
+<app-menu (closeEvent)="forceCloseMenu()" [@slideInOut]="menuState"></app-menu>
 
 
 <router-outlet></router-outlet>

@@ -1,12 +1,18 @@
-
 <table class="main-nav">
-  <tr class="main-nav-item" routerLink="" (click)="hideMenu()"><i class="fa fa-home" aria-hidden="true"></i>&nbsp;Test 1</tr>
-  <tr class="main-nav-item" routerLink="login" (click)="hideMenu()"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Really long test to see if it fits</tr>
-  <tr class="main-nav-item" routerLink="" (click)="hideMenu()"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;another test</tr>
+    <tr (click)="hideMenu()" class="main-nav-item" routerLink=""><i aria-hidden="true" class="fa fa-home"></i>&nbsp;Test
+        1
+    </tr>
+    <tr (click)="hideMenu()" class="main-nav-item" routerLink="login"><i aria-hidden="true" class="fa fa-pencil"></i>&nbsp;Really
+        long test to see if it fits
+    </tr>
+    <tr (click)="hideMenu()" class="main-nav-item" routerLink=""><i aria-hidden="true" class="fa fa-pencil"></i>&nbsp;another
+        test
+    </tr>
 </table>
 
 <div class="privacy">
-  <i class="fa fa-user-secret"></i> Privacybeleid
+    <i class="fa fa-user-secret"></i>
+    Privacybeleid
 </div>
 
 <div class="footer">
