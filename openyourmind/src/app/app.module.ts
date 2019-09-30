@@ -8,6 +8,8 @@ import {HomeComponent} from './home/home.component';
 import {LoginComponent} from './login/login.component';
 import {MenuComponent} from './menu/menu.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ChartComponent} from './chart/chart.component';
+import {HighchartsChartComponent} from 'highcharts-angular';
 
 
 @NgModule({
@@ -15,7 +17,9 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
         AppComponent,
         HomeComponent,
         LoginComponent,
-        MenuComponent
+        MenuComponent,
+		ChartComponent,
+		HighchartsChartComponent
     ],
     imports: [
         BrowserModule,

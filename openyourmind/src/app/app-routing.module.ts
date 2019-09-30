@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {HomeComponent} from "./home/home.component";
 import {LoginComponent} from "./login/login.component";
+import {ChartComponent} from "./chart/chart.component";
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -12,6 +13,10 @@ const routes: Routes = [
     {
         path: 'login',
         component: LoginComponent
+    },
+    {
+        path: 'chart',
+        component: ChartComponent
     }
 ];
 
