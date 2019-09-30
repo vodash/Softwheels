@@ -11,6 +11,7 @@ export class ChartComponent {
       chart: {
          type: "spline"
       },
+	  credits: false,
       title: {
          text: "Monthly Average Temperature"
       },
