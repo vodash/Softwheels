@@ -13,6 +13,7 @@ import {HighchartsChartComponent} from 'highcharts-angular';
 import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
 
 
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -21,7 +22,7 @@ import { DoctorProfileComponent } from './doctor-profile/doctor-profile.componen
         MenuComponent,
 		ChartComponent,
 		HighchartsChartComponent,
-		DoctorProfileComponent
+		DoctorProfileComponent,
     ],
     imports: [
         BrowserModule,
