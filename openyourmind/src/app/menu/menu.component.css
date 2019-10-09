@@ -83,5 +83,12 @@ fa.fa-globe {
 
 .main-nav>a{
     display: block;
-    font-size: 16px;
+    font-size: 22px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    margin-top: 5px;
+}
+.welcome{
+    padding-top: 16px;
 }
