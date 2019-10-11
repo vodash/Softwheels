@@ -1,0 +1,17 @@
+/*Patient section*/
+
+.patient{
+    margin-top: 25px;
+    margin-bottom: 0;
+    color: #155a7d;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+
+}
+
+.underline{
+    border-bottom: solid 3px #86cce5;
+    margin-right: -20%;
+}
+
+/*patient section stop*/
