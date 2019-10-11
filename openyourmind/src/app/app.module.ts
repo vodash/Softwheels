@@ -11,6 +11,7 @@ import {ChartComponent} from './chart/chart.component';
 import {HighchartsChartComponent} from 'highcharts-angular';
 import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
 import { PatientProfileComponent } from './patient-profile/patient-profile.component';
+import { PatientOverviewComponent } from './patient-overview/patient-overview.component';
 
 
 
@@ -23,6 +24,7 @@ import { PatientProfileComponent } from './patient-profile/patient-profile.compo
 		HighchartsChartComponent,
 		DoctorProfileComponent,
 		PatientProfileComponent,
+		PatientOverviewComponent,
     ],
     imports: [
         BrowserModule,
