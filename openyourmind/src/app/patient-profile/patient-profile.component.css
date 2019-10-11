@@ -6,7 +6,7 @@
     color: #155a7d;
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
-
+    font-size: 8vh;
 }
 
 .underline{
@@ -14,4 +14,26 @@
     margin-right: -20%;
 }
 
-/*patient section stop*/
+/*patient options*/
+.patientoptions{
+    margin-top: 8%;
+}
+
+.bluebutton{
+    background: #5abcdf;
+}
+
+.aligncenter{
+    text-align: center;
+}
+
+.optionimg{
+    /*margin: 20px 0;*/
+    padding: 40px;
+    box-shadow: 5px 5px 15px -1px rgba(0,0,0,0.35);
+}
+
+.optiontitle{
+    font-size: 5vh;
+    margin-top: 25px;
+}

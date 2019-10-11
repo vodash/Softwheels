@@ -17,7 +17,7 @@
     font-size: 19px;
     line-height: 3;
     font-weight: 400;
-    margin-top: 75px;
+    margin-top: 30px;
     padding: 0px 30px;
     list-style: none;
     width: 100%;
@@ -87,8 +87,8 @@ fa.fa-globe {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
-    margin-top: 5px;
+    margin-top: 13px;
 }
 .welcome{
-    padding-top: 16px;
+    padding-top: 17%
 }
