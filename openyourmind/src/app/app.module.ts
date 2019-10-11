@@ -10,6 +10,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ChartComponent} from './chart/chart.component';
 import {HighchartsChartComponent} from 'highcharts-angular';
 import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
+import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 
 
 
@@ -21,6 +22,7 @@ import { DoctorProfileComponent } from './doctor-profile/doctor-profile.componen
 		ChartComponent,
 		HighchartsChartComponent,
 		DoctorProfileComponent,
+		PatientProfileComponent,
     ],
     imports: [
         BrowserModule,
