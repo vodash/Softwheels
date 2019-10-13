@@ -3,3 +3,27 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
     background: #d7e4e8a6 !important; }
+
+/*global title styles*/
+.patient{
+    margin-top: 25px;
+    margin-bottom: 0;
+    color: #155a7d;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 8vh;
+}
+
+.underline{
+    border-bottom: solid 3px #86cce5;
+    margin-right: -20%;
+}
+
+/*style for blue button as used in patientoverview and patient profile*/
+.bluebutton{
+    background: #5abcdf;
+}
+
+.aligncenter{
+    text-align: center;
+}

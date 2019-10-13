@@ -6,7 +6,7 @@
     top: 0;
     right: auto;
     bottom: 0;
-    width: 18%;
+    width: 17%;
     min-width: 250px;
     z-index: 8888;
     font-family: 'Roboto', sans-serif;
@@ -18,7 +18,7 @@
     line-height: 3;
     font-weight: 400;
     margin-top: 30px;
-    padding: 0px 30px;
+    padding: 0 15px;
     list-style: none;
     width: 100%;
 }

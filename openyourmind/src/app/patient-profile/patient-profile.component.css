@@ -1,19 +1,5 @@
 /*Patient section*/
 
-.patient{
-    margin-top: 25px;
-    margin-bottom: 0;
-    color: #155a7d;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 700;
-    font-size: 8vh;
-}
-
-.underline{
-    border-bottom: solid 3px #86cce5;
-    margin-right: -20%;
-}
-
 .backToOverview{
     width: 5%;
     margin-top: 2%;
@@ -23,14 +9,6 @@
 /*patient options*/
 .patientoptions{
     margin-top: 8%;
-}
-
-.bluebutton{
-    background: #5abcdf;
-}
-
-.aligncenter{
-    text-align: center;
 }
 
 .optionimg{
