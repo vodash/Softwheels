@@ -16,7 +16,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
 
 .underline{
     border-bottom: solid 3px #86cce5;
-    margin-right: -20%;
+    margin-right: -23% !important;
 }
 
 /*style for blue button as used in patientoverview and patient profile*/
