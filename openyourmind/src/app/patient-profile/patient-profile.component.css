@@ -14,6 +14,12 @@
     margin-right: -20%;
 }
 
+.backToOverview{
+    width: 5%;
+    margin-top: 2%;
+    cursor: pointer;
+}
+
 /*patient options*/
 .patientoptions{
     margin-top: 8%;
@@ -29,7 +35,7 @@
 
 .optionimg{
     /*margin: 20px 0;*/
-    padding: 40px;
+    padding: 50px;
     box-shadow: 5px 5px 15px -1px rgba(0,0,0,0.35);
 }
 
