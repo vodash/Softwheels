@@ -12,7 +12,8 @@ import {HighchartsChartComponent} from 'highcharts-angular';
 import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
 import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 import { PatientOverviewComponent } from './patient-overview/patient-overview.component';
-import {Router} from '@angular/router';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -21,17 +22,22 @@ import {Router} from '@angular/router';
         AppComponent,
         LoginComponent,
         MenuComponent,
-		ChartComponent,
-		HighchartsChartComponent,
-		DoctorProfileComponent,
-		PatientProfileComponent,
-		PatientOverviewComponent,
+        ChartComponent,
+        HighchartsChartComponent,
+        DoctorProfileComponent,
+        PatientProfileComponent,
+        PatientOverviewComponent
     ],
     imports: [
         BrowserModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        NgbModule
+        NgbModule,
+        ReactiveFormsModule,
+        FormsModule,
+        HttpClientModule
+
+
     ],
     providers: [],
     bootstrap: [AppComponent]
