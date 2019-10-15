@@ -1,7 +1,7 @@
 <!--This file holds all the content you want to show on every page. so : Menu button and banner. This also needs to import the router-outlet - kevin-->
 
-<app-menu></app-menu>
-
-
+<div *ngIf="_router.url != '/'">
+    <app-menu></app-menu>
+</div>
 
 <router-outlet></router-outlet>
