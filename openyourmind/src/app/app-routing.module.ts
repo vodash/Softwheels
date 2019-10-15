@@ -4,7 +4,7 @@ import {LoginComponent} from './login/login.component';
 import {ChartComponent} from './chart/chart.component';
 import {DoctorProfileComponent} from './doctor-profile/doctor-profile.component';
 import {PatientProfileComponent} from './patient-profile/patient-profile.component';
-import {PatientOverviewComponent} from "./patient-overview/patient-overview.component";
+import {PatientOverviewComponent} from './patient-overview/patient-overview.component';
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -24,7 +24,7 @@ const routes: Routes = [
         path: 'patient',
         component: PatientProfileComponent
     },{
-        path: 'patientOverview',
+        path: 'patient-overview',
         component: PatientOverviewComponent
     }
 ];

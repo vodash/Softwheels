@@ -12,6 +12,7 @@ import {HighchartsChartComponent} from 'highcharts-angular';
 import { DoctorProfileComponent } from './doctor-profile/doctor-profile.component';
 import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 import { PatientOverviewComponent } from './patient-overview/patient-overview.component';
+import {Router} from '@angular/router';
 
 
 
@@ -36,4 +37,5 @@ import { PatientOverviewComponent } from './patient-overview/patient-overview.co
     bootstrap: [AppComponent]
 })
 export class AppModule {
+
 }

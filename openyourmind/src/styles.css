@@ -4,6 +4,9 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
     background: #d7e4e8a6 !important; }
 
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.1); }
+
 /*global title styles*/
 .patient{
     margin-top: 25px;

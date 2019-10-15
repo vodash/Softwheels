@@ -1,5 +1,6 @@
 import {Component, HostBinding, Input, Output} from '@angular/core';
 import {trigger, state, style, transition, animate} from '@angular/animations';
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-root',
@@ -8,8 +9,7 @@ import {trigger, state, style, transition, animate} from '@angular/animations';
 })
 export class AppComponent {
     title = 'Open your mind';
-
-
+    constructor(private _router: Router) { }
 
     ngInit() {}
 }

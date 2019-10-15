@@ -21,3 +21,34 @@
     font-size: 5vh;
     margin-top: 25px;
 }
+
+.profilephoto{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border:solid 10px #ff6f61;
+    margin-left: -38%;
+    margin-top: -27%;
+}
+
+.profilepic{
+    display: inline;
+    margin: 0 auto;
+    height: auto;
+    width: 100%;
+    object-fit: cover;
+}
+
+.patientprofile{
+    border-top: solid 6px #ff6f61;
+    border-left: solid 6px #ff6f61;
+    padding: 36px 12% 36px 12%;
+    border-right: solid 6px #86cce5;
+    margin-top: -25%;
+    border-bottom: solid 6px #86cce5;
+    margin-left: 4%;
+}

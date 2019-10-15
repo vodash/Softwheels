@@ -1,10 +1,11 @@
 .wrapper {
-    background: #bdbdbd;
+    background: #5abcdf;
     height: 100vh;
 }
 
-.whitetext {
-    color: #fff;
+.bluetext {
+    color: #17a2b8;
+    margin-bottom: 5%;
 }
 
 .formmarg {
@@ -16,3 +17,11 @@
     min-height: 100vh;
 }
 
+.whitebox{
+    background:rgba(255, 255, 255, 0.8);
+    opacity:80%;
+    -webkit-box-shadow: 3px 4px 14px -1px rgba(0,0,0,0.77);
+    -moz-box-shadow: 3px 4px 14px -1px rgba(0,0,0,0.77);
+    box-shadow: 3px 4px 14px -1px rgba(0,0,0,0.77);
+    padding: 15px;
+}
