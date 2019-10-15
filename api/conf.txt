@@ -4,6 +4,7 @@ pymysql
 flask-mysql
 flask-sqlalchemy
 flask-restful
+flask-jwt
 
 pip/pacman:
 gunicorn
