@@ -1,0 +1,2 @@
+curl -i -X POST -H 'Content-Type: application/json' -d '{"username": "user1", "password": "abcxyz"}' localhost:5000/auth
+curl -H "Authorization: JWT <token>" localhost:5000/protected

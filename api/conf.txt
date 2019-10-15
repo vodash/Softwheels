@@ -1,0 +1,13 @@
+pip:
+flask
+pymysql
+flask-mysql
+flask-sqlalchemy
+flask-restful
+
+pip/pacman:
+gunicorn
+
+my.cnf:
+[mysqld]
+skip-name-resolve
