@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import safe_str_cmp
 from datetime import timedelta
+from flask_cors import CORS
 
 class User(object):
     def __init__(self, id, username, password):
@@ -12,13 +13,13 @@ class User(object):
     def __str__(self):
         return "User(id='%s')" % self.id
 
-users = [
+users_test = [
     User(1, 'user1', 'abcxyz'),
     User(2, 'user2', 'abcxyz'),
 ]
 
-username_table = {u.username: u for u in users}
-userid_table = {u.id: u for u in users}
+username_table = {u.username: u for u in users_test}
+userid_table = {u.id: u for u in users_test}
 
 def authenticate(username, password):
     user = username_table.get(username, None)
@@ -33,6 +34,7 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'superdupergeheimesleutel'
 app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
+CORS(app)
 
 jwt = JWT(app, authenticate, identity)
 
