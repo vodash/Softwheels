@@ -13,8 +13,8 @@ import {printLine} from "tslint/lib/verify/lines";
 export class LoginComponent  {
 //    form = FormGroup
     form = new FormGroup({
-        firstName: new FormControl(''),
-        lastName: new FormControl(''),});
+        username: new FormControl(''),
+        password: new FormControl(''),});
 
     constructor(private fb: FormBuilder,
                 private authService: AuthService,
@@ -22,19 +22,17 @@ export class LoginComponent  {
     }
 
     login() {
-        console.log('test')
         const val = this.form.value;
         console.log(val)
         if (val.username && val.password) {
-            console.log('test')
             this.authService.login(val.username, val.password)
                 .subscribe(
                     () => {
                         console.log("User is logged in");
                         this.router.navigateByUrl('/');
+
                     }
                 );
-            console.log('test')
         }
     }
 }

@@ -2,7 +2,7 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
-    background: #d7e4e8a6 !important; }
+    background: #d7e4e8a6   !important; }
 
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.1); }
@@ -29,4 +29,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
 
 .aligncenter{
     text-align: center;
+}
+
+.form-control{
+    background-color: #f2f6f7 !important;
 }
