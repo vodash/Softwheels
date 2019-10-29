@@ -1,0 +1,13 @@
+.backTo{
+    width: 5%;
+    margin-top: 2%;
+    cursor: pointer;
+}
+
+.highcharts-legend{
+    position: relative;
+}
+
+.highcharts-legend-item>span{
+
+}

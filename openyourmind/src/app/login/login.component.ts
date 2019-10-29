@@ -28,7 +28,7 @@ export class LoginComponent  {
                 .subscribe(
                     () => {
                         console.log("User is logged in");
-                        // this.router.navigateByUrl('/profile');
+                         this.router.navigateByUrl('/profile');
 
                     }
                 );
