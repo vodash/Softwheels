@@ -14,6 +14,7 @@ import { PatientProfileComponent } from './patient-profile/patient-profile.compo
 import { PatientOverviewComponent } from './patient-overview/patient-overview.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import {AuthGuardService} from './authentication/auth-guard.service';
 
 
 
@@ -39,7 +40,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 
     ],
-    providers: [],
+    providers: [AuthGuardService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

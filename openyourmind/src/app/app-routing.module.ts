@@ -5,6 +5,7 @@ import {ChartComponent} from './chart/chart.component';
 import {DoctorProfileComponent} from './doctor-profile/doctor-profile.component';
 import {PatientProfileComponent} from './patient-profile/patient-profile.component';
 import {PatientOverviewComponent} from './patient-overview/patient-overview.component';
+import {AuthGuardService as AuthGuard} from './authentication/auth-guard.service';
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -14,7 +15,8 @@ const routes: Routes = [
     },
     {
         path: 'chart',
-        component: ChartComponent
+        component: ChartComponent,
+        canActivate: [AuthGuard]
     },
     {
         path: 'profile',
@@ -23,7 +25,8 @@ const routes: Routes = [
     {
         path: 'patient',
         component: PatientProfileComponent
-    },{
+    },
+    {
         path: 'patient-overview',
         component: PatientOverviewComponent
     }
