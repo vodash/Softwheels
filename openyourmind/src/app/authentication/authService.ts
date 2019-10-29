@@ -14,9 +14,8 @@ export class AuthService {
 
     login(username: string, password: string ) {
         console.log(username, password);
-        // TODO: make a redirect to another page one logged in
         return this.http.post(environment.adress + '/auth', {username, password}).pipe(map(user => {
-            // store user details and jwt token in local storage to keep user logged in between page refreshess
+            // store user details and jwt token in local storage to keep user logged in between page refreshes
             this.setStorage(user['access_token']);
         }));
     }
@@ -24,7 +23,9 @@ export class AuthService {
     setStorage(user: any) {
         localStorage.setItem('id_token', JSON.stringify(user));
     }
-
+    getStorage() {
+       const storageitem = localStorage.getItem('id-token');
+    }
     logout() {
         localStorage.removeItem('id_token');
     }
@@ -34,6 +35,13 @@ export class AuthService {
         } else {
             return false;
         }
+    }
+    GetuserID(storageItem: any) {
+        console.log('called getuserid')
+        return this.http.post(environment.adress + '/protected', { storageItem }).pipe(map(user => {
+            console.log('was here');
+            console.log(user);
+        }));
     }
 }
 

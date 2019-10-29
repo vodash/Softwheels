@@ -6,12 +6,14 @@ import {DoctorProfileComponent} from './doctor-profile/doctor-profile.component'
 import {PatientProfileComponent} from './patient-profile/patient-profile.component';
 import {PatientOverviewComponent} from './patient-overview/patient-overview.component';
 import {AuthGuardService as AuthGuard} from './authentication/auth-guard.service';
+import {LoginAuthGuardService as LoginAuthGuard} from './authentication/auth-guard-login.service';
 
 // router module for navigation in the web app
 const routes: Routes = [
     {
         path: '',
-        component: LoginComponent
+        component: LoginComponent,
+        canActivate: [LoginAuthGuard]
     },
     {
         path: 'chart',
