@@ -11,6 +11,7 @@ export class LoginAuthGuardService implements CanActivate {
     // This function checks is the user is logged in. If this is true they will be redirected from the login page
     canActivate() {
         if ( this.AuthServices.isLoggedIn()) {
+            this.reRouter.navigateByUrl('/profile')
             return false;
         } else {
             return true;
