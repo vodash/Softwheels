@@ -15,6 +15,7 @@ import { PatientOverviewComponent } from './patient-overview/patient-overview.co
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import {AuthGuardService} from './authentication/auth-guard.service';
+import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
 
 
 
@@ -40,7 +41,7 @@ import {AuthGuardService} from './authentication/auth-guard.service';
 
 
     ],
-    providers: [AuthGuardService],
+    providers: [AuthGuardService, LoginAuthGuardService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -1,4 +1,6 @@
 import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {AuthService} from '../authentication/authService';
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-menu',
@@ -7,10 +9,16 @@ import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 })
 export class MenuComponent implements OnInit {
 
+    constructor(
+        private authService: AuthService,
+        private router: Router
+    ){}
+
     @Output() closeEvent: EventEmitter<string> = new EventEmitter();
 
-    hideMenu() {
-        this.closeEvent.emit('in');
+    logout() {
+        this.authService.logout();
+        this.router.navigateByUrl('/');
     }
 
     ngOnInit() {

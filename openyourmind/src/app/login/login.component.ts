@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthService} from '../authentication/authService';
-import {printLine} from "tslint/lib/verify/lines";
 
 
 @Component({
@@ -29,7 +28,7 @@ export class LoginComponent  {
                 .subscribe(
                     () => {
                         console.log("User is logged in");
-                        this.router.navigateByUrl('/');
+                        // this.router.navigateByUrl('/profile');
 
                     }
                 );
