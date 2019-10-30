@@ -2,4 +2,4 @@ test=$(curl -i -s -X POST -H 'Content-Type: application/json' -d '{"username": "
 test=${test#'"'} #remove prefix
 test=${test%'"'} #remove suffix
 echo $test
-#curl -H "Authorization: JWT $test" localhost:8000/protected
+curl -H "Authorization: JWT $test" localhost:8000/protected
