@@ -1,3 +1,3 @@
 export const environment = {
-    adress: 'http://aitai.nl:14164'
+    adress: 'http://10.0.96.246:8000'
 };

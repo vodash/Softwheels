@@ -18,16 +18,12 @@ export class AuthService {
             // store user details and jwt token in local storage to keep user logged in between page refreshes
             let token = String(user['access_token']).replace(/['"]+/g, '');
             console.log(token);
-            // token = token.substring(1, token.length() - 1);
             this.setStorage(token);
         }));
     }
 
     setStorage(user: string) {
         localStorage.setItem('id_token', user);
-    }
-    getStorage() {
-       return localStorage.getItem('id_token');
     }
     logout() {
         localStorage.removeItem('id_token');
@@ -39,6 +35,9 @@ export class AuthService {
             return false;
         }
     }
+    getStorage() {
+        return localStorage.getItem('id_token');
+    }
     GetuserID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
@@ -46,5 +45,14 @@ export class AuthService {
             console.log(user);
         }));
     }
+    GetdataonID() {
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/fake', { headers: autorization }).pipe(map( data => {
+            console.log(data);
+            console.log(data['hoi'][0]["name"]);
+        }));
+    }
+
 }
 

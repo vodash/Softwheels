@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import * as Highcharts from 'highcharts';
+import {AuthService} from '../authentication/authService';
+
 @Component({
    selector: 'app-chart',
    templateUrl: './chart.component.html',
    styleUrls: ['./chart.component.css']
 })
-export class ChartComponent {
+export class ChartComponent implements OnInit {
    highcharts = Highcharts;
    chartOptions = {
       chart: {
@@ -64,4 +66,16 @@ export class ChartComponent {
          data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0]
       }]
    };
+   constructor(private authService: AuthService
+    ) {}
+    ngOnInit() {
+        this.authService.GetdataonID()
+            .subscribe(
+                () => {
+                }
+            );
+    }
+    setdata() {
+
+    }
 }
