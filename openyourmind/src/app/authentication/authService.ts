@@ -16,15 +16,18 @@ export class AuthService {
         console.log(username, password);
         return this.http.post(environment.adress + '/auth', {username, password}).pipe(map(user => {
             // store user details and jwt token in local storage to keep user logged in between page refreshes
-            this.setStorage(user['access_token']);
+            let token = String(user['access_token']).replace(/['"]+/g, '');
+            console.log(token);
+            // token = token.substring(1, token.length() - 1);
+            this.setStorage(token);
         }));
     }
 
-    setStorage(user: any) {
-        localStorage.setItem('id_token', JSON.stringify(user));
+    setStorage(user: string) {
+        localStorage.setItem('id_token', user);
     }
     getStorage() {
-       const storageitem = localStorage.getItem('id-token');
+       return localStorage.getItem('id_token');
     }
     logout() {
         localStorage.removeItem('id_token');
@@ -36,10 +39,10 @@ export class AuthService {
             return false;
         }
     }
-    GetuserID(storageItem: any) {
-        console.log('called getuserid')
-        return this.http.post(environment.adress + '/protected', { storageItem }).pipe(map(user => {
-            console.log('was here');
+    GetuserID() {
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/protected', { headers: autorization }).pipe(map( user => {
             console.log(user);
         }));
     }

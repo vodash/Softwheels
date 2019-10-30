@@ -12,7 +12,7 @@ export class MenuComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private router: Router
-    ){}
+    ){ }
 
     @Output() closeEvent: EventEmitter<string> = new EventEmitter();
 
