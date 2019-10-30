@@ -8,6 +8,7 @@
     position: relative;
 }
 
-.highcharts-legend-item>span{
-
+highcharts-chart .highcharts-legend-item>span{
+    padding: 8px 26px;
+    border-radius: 17%;
 }

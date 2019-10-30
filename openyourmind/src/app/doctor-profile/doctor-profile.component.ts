@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {AuthService} from "../authentication/authService";
 
 @Component({
   selector: 'app-doctor-profile',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DoctorProfileComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: AuthService
+  ) {}
 
   ngOnInit() {
+  }
+  test() {
+      this.authService.GetuserID()
+          .subscribe(
+              () => {
+                  console.log("work pls");
+              }
+          );
   }
 
 }

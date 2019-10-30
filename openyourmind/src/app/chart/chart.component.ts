@@ -13,13 +13,20 @@ export class ChartComponent {
           backgroundColor: 'none'
       },
        legend: {
-           useHTML: true,
            align: 'center',
            verticalAlign: 'top',
            layout: 'horizontal',
            x: 0,
-           y: 100,
-           symbolWidth: 0
+           y: 0,
+           symbolWidth: 0,
+           itemMarginBottom: 60,
+           itemMarginTop: 0,
+           itemStyle: {
+               color: '#333333',
+               cursor: 'pointer',
+               fontSize: '20px',
+               fontWeight: 'bold',
+           }
        },
        credits: false,
       title: {
@@ -29,16 +36,16 @@ export class ChartComponent {
          text: ''
       },
       xAxis: {
-         categories:["M", "T", "W", "T", "F", "S",
-            "S"]
+         categories: ['M', 'T', 'W', 'T', 'F', 'S',
+            'S']
       },
       yAxis: {
          title: {
-            text:"Temperature °C"
+            text: 'Temperature °C'
          }
       },
       tooltip: {
-         valueSuffix:" °C"
+         valueSuffix: ' °C'
       },
       series: [{
          name: 'Tokyo',
