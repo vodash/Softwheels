@@ -58,7 +58,6 @@ def authenticate(username, password):
     # return bla
 
 def identity(payload):
-    print(user_id)
     return user_id
     # user_id = payload['identity']
     # return userid_table.get(user_id, None)
@@ -81,6 +80,7 @@ from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
 @app.route('/add', methods=['POST'])
+@jwt_required()
 def add_user():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -110,6 +110,7 @@ def add_user():
         conn.close()
 
 @app.route('/users')
+@jwt_required()
 def users():
     conn = mysql.connect()
     try:
@@ -126,6 +127,7 @@ def users():
         conn.close()
 
 @app.route('/user/<int:id>')
+@jwt_required()
 def user(id):
     conn = mysql.connect()
     try:
@@ -142,6 +144,7 @@ def user(id):
         conn.close()
 
 @app.route('/update', methods=['POST'])
+@jwt_required()
 def update_user():
     conn = mysql.connect()
     try:
@@ -172,6 +175,7 @@ def update_user():
         conn.close()
 
 @app.route('/delete/<int:id>')
+@jwt_required()
 def delete_user(id):
     conn = mysql.connect()
     try:
