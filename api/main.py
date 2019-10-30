@@ -191,6 +191,12 @@ def delete_user(id):
         cursor.close()
         conn.close()
 
+@app.route('/fake')
+@jwt_required()
+def fake_data():
+    p = '{"hoi":[{ "name": "Yomom", "data": [1.0, 16.9, 129.5, 14.5, 18.2, 21.5, 25.2,26.5, 23.3, 18.3, 13.9, 9.6] }, { "name": "Isfat", "data": [9.0, 26.9, 2.5, 144.5, 118.2, 221.5, 125.2, 126.5, 223.3, 218.3, 213.9, 29.6]}]}'
+    return p
+
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
