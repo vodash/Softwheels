@@ -4,6 +4,7 @@ from werkzeug.security import safe_str_cmp
 from datetime import timedelta
 from flask_cors import CORS
 from flaskext.mysql import MySQL
+from random import random
 
 mysql = MySQL()
 
@@ -204,10 +205,19 @@ def delete_user(id):
         conn.close()
 
 @app.route('/fake')
-@jwt_required()
+# @jwt_required()
 def fake_data():
-    p = '{"hoi":[{ "name": "Yomom", "data": [1.0, 16.9, 129.5, 14.5, 18.2, 21.5, 25.2,26.5, 23.3, 18.3, 13.9, 9.6] }, { "name": "Isfat", "data": [9.0, 26.9, 2.5, 144.5, 118.2, 221.5, 125.2, 126.5, 223.3, 218.3, 213.9, 29.6]}]}'
-    return p
+    data = [ round(random()*10, 1) for i in range(20) ]
+    message = {
+        'hoi':[
+            {'name': 'Yomom',
+             'data': data[:10]},
+            {'name': 'Isfat',
+             'data': data[10:]}
+        ]
+    }
+    resp = jsonify(message)
+    return resp
 
 @app.route('/addpatient', methods=['POST'])
 @jwt_required()
