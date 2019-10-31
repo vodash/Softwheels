@@ -82,9 +82,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 @app.route('/add', methods=['POST'])
 @jwt_required()
 def add_user():
-    conn = mysql.connect()
-    cursor = conn.cursor()
+    conn = None
+    cursor = None
     try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
         _json = request.json
         _voornaam = _json['voornaam']
         _achternaam = _json['achternaam']
@@ -113,8 +115,10 @@ def add_user():
 @app.route('/users')
 @jwt_required()
 def users():
-    conn = mysql.connect()
+    conn = None
+    cursor = None
     try:
+        conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM professional")
         rows = cursor.fetchall()
@@ -130,8 +134,10 @@ def users():
 @app.route('/user/<int:id>')
 @jwt_required()
 def user(id):
-    conn = mysql.connect()
+    conn = None
+    cursor = None
     try:
+        conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM professional WHERE user_id=%s", id)
         row = cursor.fetchone()
@@ -147,7 +153,8 @@ def user(id):
 @app.route('/update', methods=['POST'])
 @jwt_required()
 def update_user():
-    conn = mysql.connect()
+    conn = None
+    cursor = None
     try:
         _json = request.json
         _id = _json['id']
@@ -162,6 +169,7 @@ def update_user():
             # save edits
             sql = "UPDATE professional SET voornaam=%s, achternaam=%s, email=%s, wachtwoord=%s WHERE id=%s"
             data = (_voornaam, _achternaam, _email, _hashed_password, _id)
+            conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sql, data)
             conn.commit()
@@ -179,8 +187,10 @@ def update_user():
 @app.route('/delete/<int:id>')
 @jwt_required()
 def delete_user(id):
-    conn = mysql.connect()
+    conn = None
+    cursor = None
     try:
+        conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM professional WHERE id=%s", id)
         conn.commit()
@@ -198,6 +208,40 @@ def delete_user(id):
 def fake_data():
     p = '{"hoi":[{ "name": "Yomom", "data": [1.0, 16.9, 129.5, 14.5, 18.2, 21.5, 25.2,26.5, 23.3, 18.3, 13.9, 9.6] }, { "name": "Isfat", "data": [9.0, 26.9, 2.5, 144.5, 118.2, 221.5, 125.2, 126.5, 223.3, 218.3, 213.9, 29.6]}]}'
     return p
+
+@app.route('/addpatient', methods=['POST'])
+@jwt_required()
+def add_patient():
+    conn = None
+    cursor = None
+    try:
+        _json = request.json
+        _voornaam = _json['voornaam']
+        _achternaam = _json['achternaam']
+        _email = _json['email']
+        _geboortedatum = _json['geboortedatum']
+        _geslacht = _json['geslacht']
+        _wachtwoord = _json['wachtwoord']
+        if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and request.method == 'POST':
+            #do not save password as a plain text
+            _hashed_password = generate_password_hash(_wachtwoord)
+            # save edits
+            sql = "INSERT INTO patient(voornaam, achternaam, email, geboortedatum, wachtwoord, geslacht) VALUES(%s, %s, %s, %s, %s, %s)"
+            data = (_voornaam, _achternaam, _email, _geboortedatum, _hashed_password)
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute(sql, data)
+            conn.commit()
+            resp = jsonify('User updated successfully!')
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.errorhandler(404)
 def not_found(error=None):
