@@ -3,14 +3,14 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {environment} from '../../htpp-conf';
 import {Router} from '@angular/router';
+import {Observable} from "rxjs";
+import {ChartData} from "../models/chartdata.model";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-
-    constructor(private http: HttpClient, public reRouter: Router) {
-    }
+    constructor(private http: HttpClient, public reRouter: Router) {}
 
     login(username: string, password: string ) {
         console.log(username, password);
@@ -45,13 +45,15 @@ export class AuthService {
             console.log(user);
         }));
     }
-    GetdataonID() {
+    GetdataonID(){
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get(environment.adress + '/fake', { headers: autorization }).pipe(map( data => {
-            console.log(data);
-            console.log(data['hoi'][0]["name"]);
-        }));
+        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe(
+        // map( data => {
+        //     console.log(data);
+        // })
+        );
+
     }
 
 }

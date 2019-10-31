@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthService} from "../authentication/authService";
+import {AuthService} from '../authentication/authService';
 
 @Component({
   selector: 'app-doctor-profile',

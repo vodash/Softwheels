@@ -3,12 +3,3 @@
     margin-top: 2%;
     cursor: pointer;
 }
-
-.highcharts-legend{
-    position: relative;
-}
-
-highcharts-chart .highcharts-legend-item>span{
-    padding: 8px 26px;
-    border-radius: 17%;
-}
