@@ -1,4 +1,4 @@
-test=$(curl -i -s -X POST -H 'Content-Type: application/json' -d '{"username": "user1", "password": "abcxyz"}' localhost:8000/auth | grep -Po '"access_token": *\K"[^"]*"') #match after access_token
+test=$(curl -i -s -X POST -H 'Content-Type: application/json' -d '{"username": "pietje@puk.pok", "password": "a"}' localhost:8000/auth | grep -Po '"access_token": *\K"[^"]*"') #match after access_token
 test=${test#'"'} #remove prefix
 test=${test%'"'} #remove suffix
 echo $test

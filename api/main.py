@@ -21,9 +21,9 @@ app.config['MYSQL_DATABASE_PORT'] = 14163
 mysql.init_app(app)
 
 class User(object):
-    def __init__(self, id, username, password=0):
+    def __init__(self, id, email, password=0):
         self.id = id
-        self.username = username
+        self.email = email
         self.password = password
 
     def __str__(self):
@@ -38,13 +38,13 @@ def authenticate(username, password):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("select user_name, user_password, user_id from tbl_user where user_name=%s", username)
+            cursor.execute("select wachtwoord, id, email from professional where email=%s", username)
             row = cursor.fetchone()
 
-            if check_password_hash(row[1], password):
+            if check_password_hash(row[0], password):
                 global user_id
-                user_id = row[2]
-                user = User(row[2], row[1])
+                user_id = row[1]
+                user = User(row[1], row[2])
                 return user
             else:
                 return None
@@ -86,16 +86,17 @@ def add_user():
     cursor = conn.cursor()
     try:
         _json = request.json
-        _name = _json['name']
+        _voornaam = _json['voornaam']
+        _achternaam = _json['achternaam']
         _email = _json['email']
-        _password = _json['pwd']
+        _wachtwoord = _json['wachtwoord']
         # validate the received values
-        if _name and _email and _password and request.method == 'POST':
+        if _voornaam and _achternaam and _email and _wachtwoord and request.method == 'POST':
             #do not save password as a plain text
-            _hashed_password = generate_password_hash(_password)
+            _hashed_password = generate_password_hash(_wachtwoord)
             # save edits
-            sql = "INSERT INTO tbl_user(user_name, user_email, user_password) VALUES(%s, %s, %s)"
-            data = (_name, _email, _hashed_password)
+            sql = "INSERT INTO professional(voornaam, achternaam, email, wachtwoord) VALUES(%s, %s, %s, %s)"
+            data = (_voornaam, _achternaam, _email, _hashed_password)
             cursor.execute(sql, data)
             conn.commit()
             resp = jsonify('User added successfully!')
@@ -115,7 +116,7 @@ def users():
     conn = mysql.connect()
     try:
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM tbl_user")
+        cursor.execute("SELECT * FROM professional")
         rows = cursor.fetchall()
         resp = jsonify(rows)
         resp.status_code = 200
@@ -132,7 +133,7 @@ def user(id):
     conn = mysql.connect()
     try:
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM tbl_user WHERE user_id=%s", id)
+        cursor.execute("SELECT * FROM professional WHERE user_id=%s", id)
         row = cursor.fetchone()
         resp = jsonify(row)
         resp.status_code = 200
@@ -150,16 +151,17 @@ def update_user():
     try:
         _json = request.json
         _id = _json['id']
-        _name = _json['name']
+        _voornaam = _json['voornaam']
+        _achternaam = _json['achternaam']
         _email = _json['email']
-        _password = _json['pwd']
+        _wachtwoord = _json['wachtwoord']
         # validate the received values
-        if _name and _email and _password and _id and request.method == 'POST':
+        if _voornaam and _achternaam and _email and _wachtwoord and _id and request.method == 'POST':
             #do not save password as a plain text
-            _hashed_password = generate_password_hash(_password)
+            _hashed_password = generate_password_hash(_wachtwoord)
             # save edits
-            sql = "UPDATE tbl_user SET user_name=%s, user_email=%s, user_password=%s WHERE user_id=%s"
-            data = (_name, _email, _hashed_password, _id)
+            sql = "UPDATE professional SET voornaam=%s, achternaam=%s, email=%s, wachtwoord=%s WHERE id=%s"
+            data = (_voornaam, _achternaam, _email, _hashed_password, _id)
             cursor = conn.cursor()
             cursor.execute(sql, data)
             conn.commit()
@@ -180,7 +182,7 @@ def delete_user(id):
     conn = mysql.connect()
     try:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tbl_user WHERE user_id=%s", (id,))
+        cursor.execute("DELETE FROM professional WHERE id=%s", id)
         conn.commit()
         resp = jsonify('User deleted successfully!')
         resp.status_code = 200
