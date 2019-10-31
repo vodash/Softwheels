@@ -253,6 +253,26 @@ def add_patient():
         cursor.close()
         conn.close()
 
+@app.route('/test', methods=['GET'])
+@jwt_required()
+def test():
+    id = request.args.get('id')
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM professional where id=%s", id)
+        rows = cursor.fetchall()
+        resp = jsonify(rows)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
