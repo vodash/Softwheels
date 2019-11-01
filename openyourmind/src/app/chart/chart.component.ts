@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import * as Highcharts from 'highcharts';
 import {AuthService} from '../authentication/authService';
-import {ChartData} from "../models/chartdata.model";
+import {ChartData} from '../models/chartdata.model';
 
 @Component({
    selector: 'app-chart',
@@ -12,11 +12,14 @@ import {ChartData} from "../models/chartdata.model";
 export class ChartComponent implements OnInit {
     Chartdata: ChartData[];
 
-    highcharts = Highcharts;
-    chartOptions = {
+    public options: any = {
         chart: {
             type: 'spline',
+            height: 700,
             backgroundColor: 'none'
+        },
+        title: {
+            text: 'Test'
         },
         legend: {
             align: 'center',
@@ -34,36 +37,27 @@ export class ChartComponent implements OnInit {
                 fontWeight: 'bold',
             }
         },
-        credits: false,
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ['M', 'T', 'W', 'T', 'F', 'S',
-                'S']
-        },
-        yAxis: {
-            title: {
-                text: 'Temperature °C'
-            }
+        credits: {
+            enabled: false
         },
         tooltip: {
             valueSuffix: ' °C'
+            }
+        ,
+        xAxis: {
+                    categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
         },
         series: [
             {
                 name: 'appel',
                 data: []
-                // this.Chartdata[0]
             },
             {
                 name: 'peer',
                 data: []
-            }]
-    };
+            }
+        ]}
+
     constructor(private authService: AuthService
     ) {
 
@@ -72,7 +66,10 @@ export class ChartComponent implements OnInit {
     ngOnInit() {
         this.authService.GetdataonID().subscribe((data => {
             this.Chartdata = data;
-            console.log(this.Chartdata['series'][0]['data']);
+            console.log(this.Chartdata['hoi'][0]['data']);
+            let charter = Highcharts.chart('container2', this.options);
+            charter.series[0].setData(this.Chartdata['hoi'][0]['data']);
+            charter.series[1].setData(this.Chartdata['hoi'][1]['data']);
         }));
     }
 }
