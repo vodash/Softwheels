@@ -9,17 +9,17 @@ from random import random
 mysql = MySQL()
 
 
-app = Flask(__name__)
-app.debug = True
-app.config['SECRET_KEY'] = 'superdupergeheimesleutel'
-app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
+application = Flask(__name__)
+application.debug = True
+application.config['SECRET_KEY'] = 'superdupergeheimesleutel'
+application.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'mym'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'blabladingeshoi'
-app.config['MYSQL_DATABASE_DB'] = 'mym'
-app.config['MYSQL_DATABASE_HOST'] = 'aitai.nl'
-app.config['MYSQL_DATABASE_PORT'] = 14163
-mysql.init_app(app)
+application.config['MYSQL_DATABASE_USER'] = 'mym'
+application.config['MYSQL_DATABASE_PASSWORD'] = 'blabladingeshoi'
+application.config['MYSQL_DATABASE_DB'] = 'mym'
+application.config['MYSQL_DATABASE_HOST'] = 'aitai.nl'
+application.config['MYSQL_DATABASE_PORT'] = 14163
+mysql.init_app(application)
 
 class User(object):
     def __init__(self, id, email, password=0):
@@ -62,11 +62,11 @@ def identity(payload):
     return user_id
     # user_id = payload['identity']
     # return userid_table.get(user_id, None)
-CORS(app)
+CORS(application)
 
-jwt = JWT(app, authenticate, identity)
+jwt = JWT(application, authenticate, identity)
 
-@app.route('/protected')
+@application.route('/protected')
 @jwt_required()
 def protected():
     return '%s' % current_identity
@@ -80,7 +80,7 @@ from flask import flash, request
 # from werkzeug import generate_password_hash, check_password_hash
 from werkzeug.security import check_password_hash, generate_password_hash
 
-@app.route('/add', methods=['POST'])
+@application.route('/add', methods=['POST'])
 @jwt_required()
 def add_user():
     conn = None
@@ -113,7 +113,7 @@ def add_user():
         cursor.close()
         conn.close()
 
-@app.route('/users')
+@application.route('/users')
 @jwt_required()
 def users():
     conn = None
@@ -132,7 +132,7 @@ def users():
         cursor.close()
         conn.close()
 
-@app.route('/user/<int:id>')
+@application.route('/user/<int:id>')
 @jwt_required()
 def user(id):
     conn = None
@@ -151,7 +151,7 @@ def user(id):
         cursor.close()
         conn.close()
 
-@app.route('/update', methods=['POST'])
+@application.route('/update', methods=['POST'])
 @jwt_required()
 def update_user():
     conn = None
@@ -185,7 +185,7 @@ def update_user():
         cursor.close()
         conn.close()
 
-@app.route('/delete/<int:id>')
+@application.route('/delete/<int:id>')
 @jwt_required()
 def delete_user(id):
     conn = None
@@ -204,7 +204,7 @@ def delete_user(id):
         cursor.close()
         conn.close()
 
-@app.route('/fake')
+@application.route('/fake')
 # @jwt_required()
 def fake_data():
     data = [ round(random()*10, 1) for i in range(20) ]
@@ -219,7 +219,7 @@ def fake_data():
     resp = jsonify(message)
     return resp
 
-@app.route('/addpatient', methods=['POST'])
+@application.route('/addpatient', methods=['POST'])
 @jwt_required()
 def add_patient():
     conn = None
@@ -253,7 +253,7 @@ def add_patient():
         cursor.close()
         conn.close()
 
-@app.route('/test', methods=['GET'])
+@application.route('/test', methods=['GET'])
 @jwt_required()
 def test():
     id = request.args.get('id')
@@ -273,7 +273,7 @@ def test():
         cursor.close()
         conn.close()
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def not_found(error=None):
     message = {
         'status': 404,
@@ -285,4 +285,4 @@ def not_found(error=None):
     return resp
 
 if __name__ == "__main__":
-    app.run()
+    application.run()
