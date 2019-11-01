@@ -16,6 +16,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import {AuthGuardService} from './authentication/auth-guard.service';
 import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
+import { PatientCreationComponent } from './patient-creation/patient-creation.component';
 
 
 
@@ -28,7 +29,8 @@ import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
         HighchartsChartComponent,
         DoctorProfileComponent,
         PatientProfileComponent,
-        PatientOverviewComponent
+        PatientOverviewComponent,
+        PatientCreationComponent
     ],
     imports: [
         BrowserModule,

@@ -10,7 +10,7 @@ import {AuthService} from '../authentication/authService';
     styleUrls: ['./login.component.css']
 })
 export class LoginComponent  {
-//    form = FormGroup
+
     form = new FormGroup({
         username: new FormControl(''),
         password: new FormControl(''),});

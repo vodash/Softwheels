@@ -1,0 +1,32 @@
+<section class="patientname">
+    <div class="container">
+        <div class="col-md-12">
+            <div class="row underline">
+                <h1 class="patient">Patient creation</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="createform">
+    <div class="container-fluid">
+        <div class="col-md-10 offset-2">
+            <form class="text-center formmarg" [formGroup]="form">
+                <div class=" col-md-8 col-offset-2">
+                    <div class="bluebox">
+                        <h1 class="">Create patient</h1>
+                        <label for="nameforpatientcreation">Name:</label>
+                        <input class="form-control col-md-10 offset-1 mb-4 logform" id="nameforpatientcreation" placeholder="name" formControlName="voornaam" type="text">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="achternaam" placeholder="Last name" type="text" formControlName="achternaam">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="dateofbirth" placeholder="Date of birth" type="text" formControlName="geboortedatum">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="gender" placeholder="Gender" type="text" formControlName="geslacht">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="bsn" placeholder="BSN" type="text" formControlName="bsn">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="wachtwoord" placeholder="wachtwoord" type="text" formControlName="wachtwoord">
+                        <input class="form-control col-md-10 offset-1 logform mb-4" id="email" placeholder="e-mail" type="text" formControlName="email">
+                        <button class="btn logbtn col-md-10 offset-1 btn-info my-4 btn-block" (click)="createPatient()">confirm</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</section>

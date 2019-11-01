@@ -41,7 +41,7 @@ export class ChartComponent implements OnInit {
             enabled: false
         },
         tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ''
             }
         ,
         xAxis: {
@@ -49,11 +49,11 @@ export class ChartComponent implements OnInit {
         },
         series: [
             {
-                name: 'appel',
+                name: 'Sleep',
                 data: []
             },
             {
-                name: 'peer',
+                name: 'Activity',
                 data: []
             }
         ]}

@@ -22,6 +22,13 @@ export class AuthService {
         }));
     }
 
+    createPatient(voornaam: string, achternaam: string, geboortedatum: string, geslacht: string, bsn: string, wachtwoord: string, email: string ) {
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.post(environment.adress + '/addpatient', {voornaam, achternaam, geboortedatum, geslacht, bsn, wachtwoord, email}, { headers: autorization }).pipe(map(user => {
+            console.log('als het goed is, is er nu een user.');
+        }));
+    }
+
     setStorage(user: string) {
         localStorage.setItem('id_token', user);
     }
