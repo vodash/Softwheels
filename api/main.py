@@ -4,7 +4,8 @@ from werkzeug.security import safe_str_cmp
 from datetime import timedelta
 from flask_cors import CORS
 from flaskext.mysql import MySQL
-from random import random
+# from random import random
+import random
 
 mysql = MySQL()
 
@@ -205,9 +206,9 @@ def delete_user(id):
         conn.close()
 
 @application.route('/fake')
-# @jwt_required()
+@jwt_required()
 def fake_data():
-    data = [ round(random()*10, 1) for i in range(20) ]
+    data = [ round(random.normalvariate(.8, .1)*10, 1) for i in range(20) ]
     message = {
         'hoi':[
             {'name': 'Yomom',
@@ -218,6 +219,15 @@ def fake_data():
     }
     resp = jsonify(message)
     return resp
+
+@application.route('/bla')
+def bla():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("select id from professional where id=1")
+    row = cursor.fetchone()
+    print(row[0])
+    return "<H1>Bla</H1>"
 
 @application.route('/addpatient', methods=['POST'])
 @jwt_required()
@@ -232,16 +242,25 @@ def add_patient():
         _geboortedatum = _json['geboortedatum']
         _geslacht = _json['geslacht']
         _wachtwoord = _json['wachtwoord']
-        if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and request.method == 'POST':
+        _bsn = _json['bsn']
+        if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and _bsn and request.method == 'POST':
+            print("post enzo")
             #do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
             # save edits
-            sql = "INSERT INTO patient(voornaam, achternaam, email, geboortedatum, wachtwoord, geslacht) VALUES(%s, %s, %s, %s, %s, %s)"
-            data = (_voornaam, _achternaam, _email, _geboortedatum, _hashed_password)
+            sql = "INSERT INTO patient(voornaam, achternaam, email, geboortedatum, wachtwoord, geslacht, bsn) VALUES(%s, %s, %s, %s, %s, %s, %s)"
+            data = (_voornaam, _achternaam, _email, _geboortedatum, _hashed_password, _geslacht, _bsn)
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sql, data)
+
+            cursor.execute("select id from patient where email=%s", _email)
+            row = cursor.fetchone()
+
+            data = (row[0], str(current_identity))
+            cursor.execute("insert into patient_professional(patient_id, professional_id) values(%s, %s)", data)
             conn.commit()
+
             resp = jsonify('User updated successfully!')
             resp.status_code = 200
             return resp
@@ -253,25 +272,26 @@ def add_patient():
         cursor.close()
         conn.close()
 
-@application.route('/test', methods=['GET'])
+@application.route('/test', methods=['GET', 'POST'])
 @jwt_required()
 def test():
     id = request.args.get('id')
     conn = None
     cursor = None
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM professional where id=%s", id)
-        rows = cursor.fetchall()
-        resp = jsonify(rows)
-        resp.status_code = 200
-        return resp
-    except Exception as e:
-        print(e)
-    finally:
-        cursor.close()
-        conn.close()
+    if request.method=='GET':
+        try:
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM professional where id=%s", id)
+            rows = cursor.fetchall()
+            resp = jsonify(rows)
+            resp.status_code = 200
+            return resp
+        except Exception as e:
+            print(e)
+        finally:
+            cursor.close()
+            conn.close()
 
 @application.errorhandler(404)
 def not_found(error=None):
