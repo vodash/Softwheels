@@ -35,7 +35,7 @@ export class PatientCreationComponent {
                         () => {
                             console.log("patient created?");
                             alert('Patient has been created.');
-                            this.reRouter.navigate(['/']);
+                            this.reRouter.navigate(['/patient-overview']);
 
                         }
                     );

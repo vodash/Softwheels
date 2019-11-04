@@ -19,7 +19,7 @@ export class ChartComponent implements OnInit {
             backgroundColor: 'none'
         },
         title: {
-            text: 'Test'
+            text: ''
         },
         legend: {
             align: 'center',
