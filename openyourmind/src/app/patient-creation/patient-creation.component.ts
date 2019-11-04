@@ -21,7 +21,7 @@ export class PatientCreationComponent {
     });
 
     constructor(private fb: FormBuilder,
-                private authService: AuthService,
+                private authService: AuthService, public reRouter: Router
                ) {
     }
 
@@ -34,6 +34,9 @@ export class PatientCreationComponent {
                     .subscribe(
                         () => {
                             console.log("patient created?");
+                            alert('Patient has been created.');
+                            this.reRouter.navigate(['/']);
+
                         }
                     );
         }
