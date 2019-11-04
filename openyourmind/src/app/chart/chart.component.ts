@@ -27,7 +27,6 @@ export class ChartComponent implements OnInit {
             layout: 'horizontal',
             x: 0,
             y: 0,
-            symbolWidth: 0,
             itemMarginBottom: 60,
             itemMarginTop: 0,
             itemStyle: {
@@ -49,11 +48,11 @@ export class ChartComponent implements OnInit {
         },
         series: [
             {
-                name: 'Sleep',
+                name: 'Activity',
                 data: []
             },
             {
-                name: 'Activity',
+                name: 'Sleep',
                 data: []
             }
         ]}
