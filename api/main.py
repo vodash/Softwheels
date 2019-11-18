@@ -4,8 +4,12 @@ from werkzeug.security import safe_str_cmp
 from datetime import timedelta
 from flask_cors import CORS
 from flaskext.mysql import MySQL
-# from random import random
 import random
+import datetime
+import pymysql
+from flask import jsonify
+from flask import flash, request
+from werkzeug.security import check_password_hash, generate_password_hash
 
 mysql = MySQL()
 
@@ -21,6 +25,7 @@ application.config['MYSQL_DATABASE_DB'] = 'mym'
 application.config['MYSQL_DATABASE_HOST'] = 'aitai.nl'
 application.config['MYSQL_DATABASE_PORT'] = 14163
 mysql.init_app(application)
+CORS(application)
 
 class User(object):
     def __init__(self, id, email, password=0):
@@ -56,14 +61,9 @@ def authenticate(username, password):
             cursor.close()
             conn.close()
     return None
-    # bla = User(1, username, password)
-    # return bla
 
 def identity(payload):
     return user_id
-    # user_id = payload['identity']
-    # return userid_table.get(user_id, None)
-CORS(application)
 
 jwt = JWT(application, authenticate, identity)
 
@@ -72,14 +72,6 @@ jwt = JWT(application, authenticate, identity)
 def protected():
     return '%s' % current_identity
 
-
-import pymysql
-# from app import app
-# from db_config import mysql
-from flask import jsonify
-from flask import flash, request
-# from werkzeug import generate_password_hash, check_password_hash
-from werkzeug.security import check_password_hash, generate_password_hash
 
 @application.route('/add', methods=['POST'])
 @jwt_required()
@@ -96,7 +88,7 @@ def add_user():
         _wachtwoord = _json['wachtwoord']
         # validate the received values
         if _voornaam and _achternaam and _email and _wachtwoord and request.method == 'POST':
-            #do not save password as a plain text
+            # do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
             # save edits
             sql = "INSERT INTO professional(voornaam, achternaam, email, wachtwoord) VALUES(%s, %s, %s, %s)"
@@ -166,7 +158,7 @@ def update_user():
         _wachtwoord = _json['wachtwoord']
         # validate the received values
         if _voornaam and _achternaam and _email and _wachtwoord and _id and request.method == 'POST':
-            #do not save password as a plain text
+            # do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
             # save edits
             sql = "UPDATE professional SET voornaam=%s, achternaam=%s, email=%s, wachtwoord=%s WHERE id=%s"
@@ -245,18 +237,20 @@ def add_patient():
         _bsn = _json['bsn']
         if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and _bsn and request.method == 'POST':
             print("post enzo")
-            #do not save password as a plain text
+            # do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
-            # save edits
+            # insert patient info into db
             sql = "INSERT INTO patient(voornaam, achternaam, email, geboortedatum, wachtwoord, geslacht, bsn) VALUES(%s, %s, %s, %s, %s, %s, %s)"
             data = (_voornaam, _achternaam, _email, _geboortedatum, _hashed_password, _geslacht, _bsn)
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sql, data)
 
+            # get the generated id for the patient
             cursor.execute("select id from patient where email=%s", _email)
             row = cursor.fetchone()
 
+            # connect the currently logged in professional to the just added patient
             data = (row[0], str(current_identity))
             cursor.execute("insert into patient_professional(patient_id, professional_id) values(%s, %s)", data)
             conn.commit()
@@ -266,6 +260,41 @@ def add_patient():
             return resp
         else:
             return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/disablepatient', methods=['GET'])
+@jwt_required()
+def disablepatient():
+    conn = None
+    cursor = None
+    _json = request.json
+    _id = _json['id']
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # check if patient exists and belongs to currently logged in professional
+        data = (_id, current_identity)
+        cursor.execute("select p.id from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where p.id=%s and pr.id=%s", data)
+        row = cursor.fetchone()
+
+        # if above is true:
+        if row:
+            sql  ="update patient set uitgeschakeld=%s where id=%s"
+            data = (datetime.datetime.now(), _id)
+            cursor.execute(sql, data)
+            conn.commit()
+            resp = jsonify('User disabled successfully!')
+            resp.status_code = 200
+            return resp
+
+        resp = jsonify('Patient does not belong to currently logged in professional')
+        resp.status_code = 500
+        return resp
     except Exception as e:
         print(e)
     finally:
