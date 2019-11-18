@@ -266,7 +266,7 @@ def add_patient():
         cursor.close()
         conn.close()
 
-@application.route('/disablepatient', methods=['GET'])
+@application.route('/disablepatient', methods=['POST'])
 @jwt_required()
 def disablepatient():
     conn = None
@@ -300,6 +300,28 @@ def disablepatient():
     finally:
         cursor.close()
         conn.close()
+
+
+@application.route('/patients', methods=['GET'])
+@jwt_required()
+def patients():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", current_identity)
+        rows = cursor.fetchall()
+        print(rows)
+        resp = jsonify(rows)
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 
 @application.route('/test', methods=['GET', 'POST'])
 @jwt_required()
