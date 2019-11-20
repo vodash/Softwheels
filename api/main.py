@@ -72,6 +72,36 @@ jwt = JWT(application, authenticate, identity)
 def protected():
     return '%s' % current_identity
 
+@application.route('/loginPatient', methods=['POST'])
+def login():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        _json = request.json
+        _username = _json['email']
+        _password = _json['wachtwoord']
+        if _username and _password:
+            cursor.execute("select wachtwoord, id, email from patient where email=%s", _username)
+            row = cursor.fetchone()
+            if check_password_hash(row[0], _password):
+                resp = jsonify({"id": row[1]})
+                resp.status_code = 200
+                return resp
+            else:
+                resp.status_code = 401
+                resp = jsonify("Login failed!")
+                return resp
+        else:
+            resp = jsonify('Username or password is missing')
+            return resp
+    except Exception as e:
+        print(e)
+        resp = jsonify('error')
+        return resp
+    finally:
+        cursor.close()
 
 @application.route('/add', methods=['POST'])
 @jwt_required()
@@ -343,6 +373,200 @@ def test():
         finally:
             cursor.close()
             conn.close()
+
+@application.route('/saveEmotionReport', methods=['POST'])
+def saveEmotionReport():
+    conn = None
+    cursor = None
+
+    try:
+        print(request.json)
+        _patient_id = request.json['PatientId']
+        _date = request.json['Date']
+        _partofday = request.json['PartOfDay']
+        _painlevel = request.json['PainLevel']
+        _happy = request.json['Happy']
+        _angry = request.json['Angry']
+        _scared = request.json['Scared']
+        _energetic = request.json['Energetic']
+        _tired = request.json['Tired']
+        _feeling = request.json['EmoticonType']
+
+        if _patient_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
+            print(2)
+            sql = "INSERT INTO emotierapport(patient_id, date, dagdeel, pijnniveau, boos, blij, energiek, moe, bang, gevoel) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            data = (_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
+            conn = mysql.connect()
+            cursor = conn.cursor()
+
+            cursor.execute(sql, data)
+            conn.commit()
+
+            resp = jsonify(_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/emotionReport/<int:patient_id>/date/<string:date>')
+def getEmotionReport(patient_id, date):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        data = (patient_id, date)
+        cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
+
+        row = cursor.fetchall()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/getEmotionReportPeriod')
+def getEmotionReportPeriod():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        _patient_id = request.json['patient_id']
+        _start_date = request.json['start_date']
+        _end_date = request.json['end_date']
+        data = (_patient_id, _start_date, _end_date)
+        cursor.execute("SELECT * FROM emotierapport WHERE patient_id=%s AND date BETWEEN %s AND %s", data)
+        row = cursor.fetchall()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/emotionReportExists')
+def getEmotionReportExists():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        _patient_id = request.json['patient_id']
+        _date = request.json['date']
+        _partofday = request.json['partofday']
+        data = (_patient_id, _date, _partofday)
+        cursor.execute("SELECT * FROM emotierapport WHERE patient_id=%s AND date=%s AND dagdeel=%s", data)
+        row = cursor.fetchone()
+        if row:
+            resp = jsonify("true")
+        else:
+            resp = jsonify("false")
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/saveNewNote', methods=['POST'])
+def saveNewNote():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        print(request.json)
+        _json = request.json
+        _note = _json['note']
+        _patient_id = _json['patient_id']
+
+        if _note and _patient_id and request.method == "POST":
+            sql = "INSERT INTO note(text) VALUES(%s)"
+            data = (_note)
+            cursor.execute(sql, data)
+
+            sql = "SELECT id from note WHERE text=%s"
+            cursor.execute(sql, data)
+
+            row = cursor.fetchone()
+            sql = "INSERT INTO patient_note(patient_id, note_id) VALUES(%s, %s)"
+            data = (_patient_id, row[0])
+
+            cursor.execute(sql, data)
+            conn.commit()
+
+            resp = jsonify('Note added')
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/getNotes/<int:id>', methods=['GET'])
+def getNotes(id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        if id and request.method == "GET":
+            sql = "SELECT patient_note.note_id, note.text FROM patient_note, note WHERE patient_id=%s AND note.id = patient_note.note_id"
+            data = (id)
+            cursor.execute(sql, data)
+
+            row = cursor.fetchall()
+            resp = jsonify(row)
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/user/<int:user_id>/note/<int:note_id>', methods=['DELETE'])
+def deleteNote(user_id, note_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        if user_id and note_id and request.method == "DELETE":
+            sql = "DELETE FROM patient_note WHERE note_id=%s AND patient_id=%s"
+            data = (note_id, user_id)
+            cursor.execute(sql, data)
+
+            conn.commit()
+            resp = jsonify('Note deleted!')
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 
 @application.errorhandler(404)
 def not_found(error=None):
