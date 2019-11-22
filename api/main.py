@@ -422,7 +422,6 @@ def getEmotionReport(patient_id, date):
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         data = (patient_id, date)
         cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
-
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
@@ -513,7 +512,6 @@ def saveNewNote():
         else:
             return not_found()
     except Exception as e:
-
         print(e)
     finally:
         cursor.close()
@@ -567,6 +565,47 @@ def deleteNote(user_id, note_id):
         cursor.close()
         conn.close()
 
+@application.route('/saveAccessToken', methods=['POST'])
+def saveAccessToken():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        _json = request.json
+        _patient_id = _json['patient_id']
+        _client_id = _json['client_id']
+        _client_secret = _json['client_secret']
+        _access_token = _json['access_token']
+        _refresh_token = _json['refresh_token']
+        _token_type = _json['token_type']
+
+        if _patient_id and _client_id and request._client_secret and _access_token and _refresh_token and _token_type == "POST":
+            sql = "SELECT patient_id from fitbit_auth WHERE _patient_id=%s"
+            cursor.execute(sql, _patient_id)
+            row = cursor.fetchone()
+            # Check if patient id already exists, if so overwrite accesstoken and refreshtoken, else create new entry.
+            if(!row[0] == _patient_id){
+                sql = "UPDATE fitbit_auth SET _access_token = %s, _refresh_token = %s WHERE _patient_id = %s"
+                data = (_access_token, _refresh_token, _patient_id)
+            }else{
+                sql = "INSERT INTO fitbit_auth(_patient_id, _client_id, _client_secret, _access_token, _refresh_token, _token_type) VALUES(%s, %s, %s, %s, %s, %s)"
+                data = (_patient_id, _client_id, _client_secret, _access_token, _refresh_token, _token_type)    
+            }
+            cursor.execute(sql, data)
+
+            conn.commit()
+
+            resp = jsonify('Access token saved')
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
 @application.errorhandler(404)
 def not_found(error=None):
