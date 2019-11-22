@@ -6,20 +6,18 @@
         <h2>Welcome, Catdoc</h2>
     </div>
     <div class="main-nav">
-        <a class="main-nav-item navstyle btn btn-custom" routerLink="profile">Main menu
+        <a class="main-nav-item navstyle btn btn-custom" routerLink="profile" routerLinkActive="active">Main menu
         </a>
-        <a class="main-nav-item navstyle btn btn-custom" routerLink="patient-overview">&nbsp;Patients
+        <a class="main-nav-item navstyle btn btn-custom" routerLink="patient-overview" routerLinkActive="active">&nbsp;Patients
         </a>
-        <a class="main-nav-item navstyle btn btn-custom" routerLink="patient-creation">&nbsp;Create new patient
+        <a class="main-nav-item navstyle btn btn-custom" routerLink="patient-creation" routerLinkActive="active">&nbsp;Create new patient
         </a>
 
     </div>
 </div>
 <div class="privacy">
-    <i class="fa fa-user-secret"></i>
-    Privacybeleid
-    <a class="main-nav-item navstyle btn btn-custom"(click)="logout()">Log Out
-    </a>
+    <div class="main-nav-item btn btn-customlog"(click)="logout()">Log Out
+    </div>
 </div>
 <div class="footer">
 </div>

@@ -12,6 +12,10 @@
     padding: 15px
 }
 
+.active{
+    border-color: #ff6f61 !important;
+}
+
 .main-nav {
     font-size: 19px;
     line-height: 3;
@@ -24,14 +28,6 @@
 
 .main-nav-item {
     cursor: pointer;
-}
-
-fa.fa-globe {
-    font-size: 120%;
-}
-
-.fa.fa-address-card {
-    font-size: 85%;
 }
 
 .privacy {
@@ -53,7 +49,7 @@ fa.fa-globe {
     height: 200px;
     position: relative;
     overflow: hidden;
-    margin: 14% 14% 0 14%;
+    margin: 14% 12% 0 9%;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -72,12 +68,13 @@ fa.fa-globe {
 }
 
 .navstyle{
-    border: 1px #52b2d5 solid;
+    border: 2px #52b2d5 solid;
     padding-bottom: 5px;
+    color: #fff;
 }
 
-.navstyle{
-    color: #fff;
+.navstyle:hover{
+    border-color: #ffffff;
 }
 
 .main-nav>a{
@@ -85,9 +82,18 @@ fa.fa-globe {
     font-size: 22px;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
-    border-radius: 0;
+    border-radius: 10px;
     margin-top: 13px;
 }
 .welcome{
     padding-top: 17%
+}
+
+.privacy{
+    margin-left: 30%;
+}
+
+.btn-customlog{
+    color: #fff;
+    border-bottom: solid #fff 1px;
 }
