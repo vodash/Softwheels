@@ -378,7 +378,6 @@ def test():
 def saveEmotionReport():
     conn = None
     cursor = None
-
     try:
         print(request.json)
         _patient_id = request.json['PatientId']
@@ -393,7 +392,6 @@ def saveEmotionReport():
         _feeling = request.json['EmoticonType']
 
         if _patient_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
-            print(2)
             sql = "INSERT INTO emotierapport(patient_id, date, dagdeel, pijnniveau, boos, blij, energiek, moe, bang, gevoel) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             data = (_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
             conn = mysql.connect()
@@ -528,7 +526,6 @@ def getNotes(id):
             sql = "SELECT patient_note.note_id, note.text FROM patient_note, note WHERE patient_id=%s AND note.id = patient_note.note_id"
             data = (id)
             cursor.execute(sql, data)
-
             row = cursor.fetchall()
             resp = jsonify(row)
             resp.status_code = 200
@@ -574,24 +571,23 @@ def saveAccessToken():
         cursor = conn.cursor()
         _json = request.json
         _patient_id = _json['patient_id']
-        _client_id = _json['client_id']
-        _client_secret = _json['client_secret']
         _access_token = _json['access_token']
         _refresh_token = _json['refresh_token']
         _token_type = _json['token_type']
 
-        if _patient_id and _client_id and request._client_secret and _access_token and _refresh_token and _token_type == "POST":
-            sql = "SELECT patient_id from fitbit_auth WHERE _patient_id=%s"
+        if _patient_id and _access_token and _refresh_token and _token_type and request.method == "POST":
+            sql = "SELECT patient_id from fitbit_auth WHERE patient_id=%s"
             cursor.execute(sql, _patient_id)
             row = cursor.fetchone()
+            print(row)
+            print(_patient_id)
             # Check if patient id already exists, if so overwrite accesstoken and refreshtoken, else create new entry.
-            if(!row[0] == _patient_id){
-                sql = "UPDATE fitbit_auth SET _access_token = %s, _refresh_token = %s WHERE _patient_id = %s"
+            if(row):
+                sql = "UPDATE fitbit_auth SET access_token = %s, refresh_token = %s WHERE patient_id = %s"
                 data = (_access_token, _refresh_token, _patient_id)
-            }else{
-                sql = "INSERT INTO fitbit_auth(_patient_id, _client_id, _client_secret, _access_token, _refresh_token, _token_type) VALUES(%s, %s, %s, %s, %s, %s)"
-                data = (_patient_id, _client_id, _client_secret, _access_token, _refresh_token, _token_type)    
-            }
+            else:
+                sql = "INSERT INTO fitbit_auth(patient_id, access_token, refresh_token, token_type) VALUES(%s, %s, %s, %s)"
+                data = (_patient_id, _access_token, _refresh_token, _token_type)   
             cursor.execute(sql, data)
 
             conn.commit()
@@ -606,6 +602,30 @@ def saveAccessToken():
     finally:
         cursor.close()
         conn.close()
+
+@application.route('/getFitbitToken/<int:user_id>', methods=['GET'])
+def getFitbitToken(user_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        if user_id and request.method == "GET":
+            sql = "SELECT access_token FROM fitbit_auth WHERE patient_id=%s"
+            data = (user_id)
+            cursor.execute(sql, data)
+            row = cursor.fetchall()
+            #only send Access code.
+            resp = jsonify(row)
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close
 
 @application.errorhandler(404)
 def not_found(error=None):
