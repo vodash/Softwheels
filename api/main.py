@@ -614,7 +614,7 @@ def getFitbitToken(user_id):
             sql = "SELECT access_token FROM fitbit_auth WHERE patient_id=%s"
             data = (user_id)
             cursor.execute(sql, data)
-            row = cursor.fetchall()
+            row = cursor.fetchone()
             #only send Access code.
             resp = jsonify(row)
             resp.status_code = 200
