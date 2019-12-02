@@ -136,6 +136,30 @@ def add_user():
         cursor.close()
         conn.close()
 
+@application.route('/isAdmin')
+@jwt_required()
+def isAdmin():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
+        rows = cursor.fetchone()
+        if rows[0]:
+            resp = "True"
+            jsonify(resp)
+            return jsonify(resp)
+        else:
+            resp = "False"
+            jsonify(resp)
+            return jsonify(resp)
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/users')
 @jwt_required()
 def users():
@@ -341,7 +365,7 @@ def patients():
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", current_identity)
+        cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", str(current_identity))
         rows = cursor.fetchall()
         print(rows)
         resp = jsonify(rows)
