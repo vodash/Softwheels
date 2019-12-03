@@ -11,6 +11,9 @@ from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import requests
+import json
+
 mysql = MySQL()
 
 
@@ -71,6 +74,45 @@ jwt = JWT(application, authenticate, identity)
 @jwt_required()
 def protected():
     return '%s' % current_identity
+
+@application.route('/refresh_fitbit_token', methods=['POST'])
+@jwt_required()
+def refresh_fitbit_token():
+    _json = request.json
+    _id = _json['id']
+    if _id and request.method == 'POST':
+        return refresh_fitbit_token_local(_id)
+    else:
+        return not_found()
+
+def refresh_fitbit_token_local(id):
+    conn = None
+    cursor = None
+    url = 'https://api.fitbit.com/oauth2/token'
+    headers = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": "Basic MjJCNVhYOmVjYzdiOWNmODk0ZjJhOTZiYzg4OWJkZjQxOTQwYTQ4"}
+
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("select refresh_token from fitbit_auth where id=%s", id)
+        refresh_token = cursor.fetchone()[0]
+        data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
+        req = requests.post(url, data=data, headers=headers)
+        out=json.loads(req.text)
+        # print(out)
+        if "access_token" in out.keys():
+            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE id=%s"
+            resp = (out["access_token"], out["refresh_token"], id)
+            cursor.execute(sql, resp)
+            conn.commit()
+            return ("Token refreshed successfully.")
+        else:
+            return ("An error occurred while refreshing FitBit access token.")
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
 @application.route('/loginPatient', methods=['POST'])
 def login():
@@ -604,4 +646,5 @@ def not_found(error=None):
     return resp
 
 if __name__ == "__main__":
+    # refresh_fitbit_token_local(1)
     application.run()
