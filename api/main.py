@@ -47,7 +47,6 @@ def authenticate(username, password):
             cursor = conn.cursor()
             cursor.execute("select wachtwoord, id, email from professional where email=%s", username)
             row = cursor.fetchone()
-
             if check_password_hash(row[0], password):
                 global user_id
                 user_id = row[1]
@@ -90,14 +89,13 @@ def login():
                 resp.status_code = 200
                 return resp
             else:
-                resp.status_code = 401
                 resp = jsonify("Login failed!")
+                resp.status_code = 401
                 return resp
         else:
             resp = jsonify('Username or password is missing')
             return resp
     except Exception as e:
-        print(e)
         resp = jsonify('error')
         return resp
     finally:
@@ -379,7 +377,6 @@ def saveEmotionReport():
     conn = None
     cursor = None
     try:
-        print(request.json)
         _patient_id = request.json['PatientId']
         _date = request.json['Date']
         _partofday = request.json['PartOfDay']
@@ -390,7 +387,7 @@ def saveEmotionReport():
         _energetic = request.json['Energetic']
         _tired = request.json['Tired']
         _feeling = request.json['EmoticonType']
-
+        _notes = request.json['Notes']
         if _patient_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
             sql = "INSERT INTO emotierapport(patient_id, date, dagdeel, pijnniveau, boos, blij, energiek, moe, bang, gevoel) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             data = (_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
@@ -399,17 +396,25 @@ def saveEmotionReport():
 
             cursor.execute(sql, data)
             conn.commit()
-
-            resp = jsonify(_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
+            emotionID = cursor.lastrowid
+            for note in _notes:
+                sql = "INSERT INTO emotierapport_note(emotierapport_id, note_id) VALUES(%s, (SELECT id FROM note WHERE text=%s))"
+                data = (emotionID, note)
+                cursor.execute(sql, data)
+                conn.commit()
+            rows = cursor.fetchall()
+            resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
             return resp
         else:
             return not_found()
     except Exception as e:
-        print(e)
+        resp = jsonify("Emotionreport could not be saved.")
+        resp.status_code = 401
     finally:
         cursor.close()
         conn.close()
+
 
 @application.route('/emotionReport/<int:patient_id>/date/<string:date>')
 def getEmotionReport(patient_id, date):
@@ -538,16 +543,18 @@ def getNotes(id):
         cursor.close()
         conn.close()
 
-@application.route('/user/<int:user_id>/note/<int:note_id>', methods=['DELETE'])
-def deleteNote(user_id, note_id):
+@application.route('/user/<int:user_id>/note/<string:note_text>', methods=['DELETE'])
+def deleteNote(user_id, note_text):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        if user_id and note_id and request.method == "DELETE":
-            sql = "DELETE FROM patient_note WHERE note_id=%s AND patient_id=%s"
-            data = (note_id, user_id)
+        print(note_text)
+        print(user_id)
+        if user_id and note_text and request.method == "DELETE":
+            sql = "DELETE FROM patient_note WHERE note_id=(SELECT id FROM note WHERE text=%s) AND patient_id=%s"
+            data = (note_text, user_id)
             cursor.execute(sql, data)
 
             conn.commit()
