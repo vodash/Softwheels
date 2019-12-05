@@ -660,6 +660,10 @@ def stopNotifications():
     return ""
 
 
+@application.route('/notificationServiceIsRunning', methods=['GET'])
+def isRunning():
+    return str(not s.empty())
+    
 @application.errorhandler(404)
 def not_found(error=None):
     message = {
