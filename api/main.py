@@ -11,8 +11,6 @@ import requests, sched, time
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
-
-import requests
 import json
 
 mysql = MySQL()
@@ -660,6 +658,7 @@ def stopNotifications():
     if len(s.queue) > 0:
         s.cancel(s.queue[0]);
     return ""
+
 
 @application.route('/notificationServiceIsRunning', methods=['GET'])
 def isRunning():
