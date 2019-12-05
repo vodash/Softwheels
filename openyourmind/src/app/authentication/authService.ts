@@ -3,7 +3,6 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {environment} from '../../htpp-conf';
 import {Router} from '@angular/router';
-import {Observable} from "rxjs";
 import {ChartData} from "../models/chartdata.model";
 
 @Injectable({
@@ -45,14 +44,29 @@ export class AuthService {
     getStorage() {
         return localStorage.getItem('id_token');
     }
-    GetuserID() {
+    getUserID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
         return this.http.get(environment.adress + '/protected', { headers: autorization }).pipe(map( user => {
             console.log(user);
         }));
     }
-    GetdataonID(){
+    getPatients(){
+        let i = 0;
+        let patients = [];
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/patients', { headers: autorization }).pipe(map( user => {
+            for (let users in user)
+            {
+                patients.push(user[i][1]);
+                console.log(patients)
+                i++
+            }
+            return patients;
+        }));
+    }
+    getDataOnID(){
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
         return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe(
@@ -60,7 +74,6 @@ export class AuthService {
         //     console.log(data);
         // })
         );
-
     }
 
 }
