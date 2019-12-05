@@ -11,8 +11,6 @@ import requests, sched, time
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
-
-import requests
 import json
 
 mysql = MySQL()
