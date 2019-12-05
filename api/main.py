@@ -7,6 +7,7 @@ from flaskext.mysql import MySQL
 import random
 import datetime
 import pymysql
+import requests, sched, time
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -15,7 +16,7 @@ import requests
 import json
 
 mysql = MySQL()
-
+s = sched.scheduler(time.time, time.sleep)
 
 application = Flask(__name__)
 application.debug = True
@@ -632,6 +633,33 @@ def deleteNote(user_id, note_id):
     finally:
         cursor.close()
         conn.close()
+
+@application.route('/sendNotifications', methods=['GET'])
+def sendNotifications():
+    now = datetime.datetime.now()
+    #Only send the notifications 3 times a day.
+    if now.hour == 10 or now.hour == 16 or now.hour == 22:
+        try:
+            headers = {'accept': 'application/json','X-API-Token': '43c80985e6f73b4a082459f78ca7b1f2b911ac6a','Content-Type': 'application/json',}
+            data = '{ "notification_content": { "name": "EmotionReport", "title": "Emotierapport", "body": "Vergeet u niet uw emotierapport in te vullen?" }}'
+            #Send notification to iOS devices
+            responseiOS = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
+            #Send notification to Android devices
+            responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
+        except Exception as e:
+            print(e)
+            
+    #Check time again in 1 hour
+    s.enter(3600, 1, sendNotifications, ())
+    s.run()
+    return ""
+        
+@application.route('/stopNotifications', methods=['GET'])
+def stopNotifications():
+    #Remove first item from the queue
+    if len(s.queue) > 0:
+        s.cancel(s.queue[0]);
+    return ""
 
 
 @application.errorhandler(404)
