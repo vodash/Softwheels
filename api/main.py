@@ -424,13 +424,33 @@ def getEmotionReport(patient_id, date):
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         data = (patient_id, date)
-        cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
+        cursor.execute("SELECT id, patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
         return resp
     except Exception as e:
-        print(e)
+        resp = jsonify(e)
+        resp.status_code = 402
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/emotionReportNotes/<int:emotionReport_id>')
+def getEmotionReportNotes(emotionReport_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT text FROM note INNER JOIN emotierapport_note ON id = note_id WHERE emotierapport_id = %s", emotionReport_id)
+        row = cursor.fetchall()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 402
     finally:
         cursor.close()
         conn.close()
