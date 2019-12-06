@@ -7,7 +7,7 @@ from flaskext.mysql import MySQL
 import random
 import datetime
 import pymysql
-import requests, sched, time
+import requests, sched, time, threading
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -49,7 +49,6 @@ def authenticate(username, password):
             cursor = conn.cursor()
             cursor.execute("select wachtwoord, id, email from professional where email=%s", username)
             row = cursor.fetchone()
-
             if check_password_hash(row[0], password):
                 global user_id
                 user_id = row[1]
@@ -131,14 +130,13 @@ def login():
                 resp.status_code = 200
                 return resp
             else:
-                resp.status_code = 401
                 resp = jsonify("Login failed!")
+                resp.status_code = 401
                 return resp
         else:
             resp = jsonify('Username or password is missing')
             return resp
     except Exception as e:
-        print(e)
         resp = jsonify('error')
         return resp
     finally:
@@ -443,9 +441,7 @@ def test():
 def saveEmotionReport():
     conn = None
     cursor = None
-
     try:
-        print(request.json)
         _patient_id = request.json['PatientId']
         _date = request.json['Date']
         _partofday = request.json['PartOfDay']
@@ -456,9 +452,8 @@ def saveEmotionReport():
         _energetic = request.json['Energetic']
         _tired = request.json['Tired']
         _feeling = request.json['EmoticonType']
-
+        _notes = request.json['Notes']
         if _patient_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
-            print(2)
             sql = "INSERT INTO emotierapport(patient_id, date, dagdeel, pijnniveau, boos, blij, energiek, moe, bang, gevoel) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             data = (_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
             conn = mysql.connect()
@@ -466,17 +461,25 @@ def saveEmotionReport():
 
             cursor.execute(sql, data)
             conn.commit()
-
-            resp = jsonify(_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
+            emotionID = cursor.lastrowid
+            for note in _notes:
+                sql = "INSERT INTO emotierapport_note(emotierapport_id, note_id) VALUES(%s, (SELECT id FROM note WHERE text=%s))"
+                data = (emotionID, note)
+                cursor.execute(sql, data)
+                conn.commit()
+            rows = cursor.fetchall()
+            resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
             return resp
         else:
             return not_found()
     except Exception as e:
-        print(e)
+        resp = jsonify("Emotionreport could not be saved.")
+        resp.status_code = 401
     finally:
         cursor.close()
         conn.close()
+
 
 @application.route('/emotionReport/<int:patient_id>/date/<string:date>')
 def getEmotionReport(patient_id, date):
@@ -486,14 +489,33 @@ def getEmotionReport(patient_id, date):
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         data = (patient_id, date)
-        cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
-
+        cursor.execute("SELECT id, patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
         return resp
     except Exception as e:
-        print(e)
+        resp = jsonify(e)
+        resp.status_code = 402
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/emotionReportNotes/<int:emotionReport_id>')
+def getEmotionReportNotes(emotionReport_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT text FROM note INNER JOIN emotierapport_note ON id = note_id WHERE emotierapport_id = %s", emotionReport_id)
+        row = cursor.fetchall()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 402
     finally:
         cursor.close()
         conn.close()
@@ -578,7 +600,6 @@ def saveNewNote():
         else:
             return not_found()
     except Exception as e:
-
         print(e)
     finally:
         cursor.close()
@@ -595,7 +616,6 @@ def getNotes(id):
             sql = "SELECT patient_note.note_id, note.text FROM patient_note, note WHERE patient_id=%s AND note.id = patient_note.note_id"
             data = (id)
             cursor.execute(sql, data)
-
             row = cursor.fetchall()
             resp = jsonify(row)
             resp.status_code = 200
@@ -608,16 +628,18 @@ def getNotes(id):
         cursor.close()
         conn.close()
 
-@application.route('/user/<int:user_id>/note/<int:note_id>', methods=['DELETE'])
-def deleteNote(user_id, note_id):
+@application.route('/user/<int:user_id>/note/<string:note_text>', methods=['DELETE'])
+def deleteNote(user_id, note_text):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        if user_id and note_id and request.method == "DELETE":
-            sql = "DELETE FROM patient_note WHERE note_id=%s AND patient_id=%s"
-            data = (note_id, user_id)
+        print(note_text)
+        print(user_id)
+        if user_id and note_text and request.method == "DELETE":
+            sql = "DELETE FROM patient_note WHERE note_id=(SELECT id FROM note WHERE text=%s) AND patient_id=%s"
+            data = (note_text, user_id)
             cursor.execute(sql, data)
 
             conn.commit()
@@ -632,7 +654,92 @@ def deleteNote(user_id, note_id):
         cursor.close()
         conn.close()
 
+@application.route('/saveAccessToken', methods=['POST'])
+def saveAccessToken():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        _json = request.json
+        _patient_id = _json['patient_id']
+        _access_token = _json['access_token']
+        _refresh_token = _json['refresh_token']
+        _token_type = _json['token_type']
+
+        if _patient_id and _access_token and _refresh_token and _token_type and request.method == "POST":
+            sql = "SELECT patient_id from fitbit_auth WHERE patient_id=%s"
+            cursor.execute(sql, _patient_id)
+            row = cursor.fetchone()
+            print(row)
+            print(_patient_id)
+            # Check if patient id already exists, if so overwrite accesstoken and refreshtoken, else create new entry.
+            if(row):
+                sql = "UPDATE fitbit_auth SET access_token = %s, refresh_token = %s WHERE patient_id = %s"
+                data = (_access_token, _refresh_token, _patient_id)
+            else:
+                sql = "INSERT INTO fitbit_auth(patient_id, access_token, refresh_token, token_type) VALUES(%s, %s, %s, %s)"
+                data = (_patient_id, _access_token, _refresh_token, _token_type)   
+            cursor.execute(sql, data)
+
+            conn.commit()
+
+            resp = jsonify('Access token saved')
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/getFitbitToken/<int:user_id>', methods=['GET'])
+def getFitbitToken(user_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        if user_id and request.method == "GET":
+            sql = "SELECT access_token FROM fitbit_auth WHERE patient_id=%s"
+            data = (user_id)
+            cursor.execute(sql, data)
+            row = cursor.fetchone()
+            #only send Access code.
+            resp = jsonify(row)
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close
+
 @application.route('/sendNotifications', methods=['GET'])
+def startThread():
+    #if we have multiple services in the queue something is wrong, clear the queue and start a new thread.
+    if len(s.queue) > 0:
+        stopNotifications()
+    
+    x = threading.Thread(target=sendNotifications, args=())
+    x.start()
+    return ""
+        
+@application.route('/stopNotifications', methods=['GET'])
+def stopNotifications():
+    #Remove all items from the queue
+    while len(s.queue) > 0:
+        s.cancel(s.queue[0])
+    return ""
+
+@application.route('/notificationServiceIsRunning', methods=['GET'])
+def isRunning():
+    return str(not s.empty())
+    
 def sendNotifications():
     now = datetime.datetime.now()
     #Only send the notifications 3 times a day.
@@ -646,23 +753,14 @@ def sendNotifications():
             responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
         except Exception as e:
             print(e)
-            
+    
+    #if we have multiple services in the queue something is wrong, clear the queue before continuing
+    if len(s.queue) > 0:
+        stopNotifications()
+        
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
-    return ""
-        
-@application.route('/stopNotifications', methods=['GET'])
-def stopNotifications():
-    #Remove first item from the queue
-    if len(s.queue) > 0:
-        s.cancel(s.queue[0]);
-    return ""
-
-
-@application.route('/notificationServiceIsRunning', methods=['GET'])
-def isRunning():
-    return str(not s.empty())
     
 @application.errorhandler(404)
 def not_found(error=None):
