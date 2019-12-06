@@ -97,3 +97,8 @@
     color: #fff;
     border-bottom: solid #fff 1px;
 }
+
+btn.focus, .btn:focus {
+    outline: 0 !important;
+    box-shadow: none !important;
+}

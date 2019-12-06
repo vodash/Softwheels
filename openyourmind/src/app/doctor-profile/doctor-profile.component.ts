@@ -12,7 +12,7 @@ export class DoctorProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-      this.authService.GetuserID()
+      this.authService.getUserID()
           .subscribe(
               () => {}
           );

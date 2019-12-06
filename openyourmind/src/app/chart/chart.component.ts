@@ -63,7 +63,7 @@ export class ChartComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authService.GetdataonID().subscribe((data => {
+        this.authService.getDataOnID().subscribe((data => {
             this.Chartdata = data;
             console.log(this.Chartdata['hoi'][0]['data']);
             let charter = Highcharts.chart('container2', this.options);
