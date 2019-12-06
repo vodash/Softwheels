@@ -680,7 +680,7 @@ def sendNotifications():
 def stopNotifications():
     #Remove first item from the queue
     if len(s.queue) > 0:
-        s.cancel(s.queue[0]);
+        s.cancel(s.queue[0])
     return ""
 
 
