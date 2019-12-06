@@ -7,12 +7,14 @@ from flaskext.mysql import MySQL
 import random
 import datetime
 import pymysql
+import requests, sched, time, threading
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
+import json
 
 mysql = MySQL()
-
+s = sched.scheduler(time.time, time.sleep)
 
 application = Flask(__name__)
 application.debug = True
@@ -71,6 +73,45 @@ jwt = JWT(application, authenticate, identity)
 def protected():
     return '%s' % current_identity
 
+@application.route('/refresh_fitbit_token', methods=['POST'])
+@jwt_required()
+def refresh_fitbit_token():
+    _json = request.json
+    _id = _json['id']
+    if _id and request.method == 'POST':
+        return refresh_fitbit_token_local(_id)
+    else:
+        return not_found()
+
+def refresh_fitbit_token_local(id):
+    conn = None
+    cursor = None
+    url = 'https://api.fitbit.com/oauth2/token'
+    headers = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": "Basic MjJCNVhYOmVjYzdiOWNmODk0ZjJhOTZiYzg4OWJkZjQxOTQwYTQ4"}
+
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("select refresh_token from fitbit_auth where id=%s", id)
+        refresh_token = cursor.fetchone()[0]
+        data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
+        req = requests.post(url, data=data, headers=headers)
+        out=json.loads(req.text)
+        # print(out)
+        if "access_token" in out.keys():
+            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE id=%s"
+            resp = (out["access_token"], out["refresh_token"], id)
+            cursor.execute(sql, resp)
+            conn.commit()
+            return ("Token refreshed successfully.")
+        else:
+            return ("An error occurred while refreshing FitBit access token.")
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/loginPatient', methods=['POST'])
 def login():
     conn = None
@@ -128,6 +169,30 @@ def add_user():
             return resp
         else:
             return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/isAdmin')
+@jwt_required()
+def isAdmin():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
+        rows = cursor.fetchone()
+        if rows[0]:
+            resp = "True"
+            jsonify(resp)
+            return jsonify(resp)
+        else:
+            resp = "False"
+            jsonify(resp)
+            return jsonify(resp)
     except Exception as e:
         print(e)
     finally:
@@ -339,7 +404,7 @@ def patients():
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", current_identity)
+        cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", str(current_identity))
         rows = cursor.fetchall()
         print(rows)
         resp = jsonify(rows)
@@ -424,13 +489,33 @@ def getEmotionReport(patient_id, date):
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         data = (patient_id, date)
-        cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
+        cursor.execute("SELECT id, patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
         return resp
     except Exception as e:
-        print(e)
+        resp = jsonify(e)
+        resp.status_code = 402
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/emotionReportNotes/<int:emotionReport_id>')
+def getEmotionReportNotes(emotionReport_id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT text FROM note INNER JOIN emotierapport_note ON id = note_id WHERE emotierapport_id = %s", emotionReport_id)
+        row = cursor.fetchall()
+        resp = jsonify(row)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 402
     finally:
         cursor.close()
         conn.close()
@@ -631,6 +716,49 @@ def getFitbitToken(user_id):
         cursor.close()
         conn.close
 
+@application.route('/sendNotifications', methods=['GET'])
+def startThread():
+    #if we have multiple services in the queue something is wrong, clear the queue and start a new thread.
+    if len(s.queue) > 0:
+        stopNotifications()
+    
+    x = threading.Thread(target=sendNotifications, args=())
+    x.start()
+    return ""
+        
+@application.route('/stopNotifications', methods=['GET'])
+def stopNotifications():
+    #Remove all items from the queue
+    while len(s.queue) > 0:
+        s.cancel(s.queue[0])
+    return ""
+
+@application.route('/notificationServiceIsRunning', methods=['GET'])
+def isRunning():
+    return str(not s.empty())
+    
+def sendNotifications():
+    now = datetime.datetime.now()
+    #Only send the notifications 3 times a day.
+    if now.hour == 10 or now.hour == 16 or now.hour == 22:
+        try:
+            headers = {'accept': 'application/json','X-API-Token': '43c80985e6f73b4a082459f78ca7b1f2b911ac6a','Content-Type': 'application/json',}
+            data = '{ "notification_content": { "name": "EmotionReport", "title": "Emotierapport", "body": "Vergeet u niet uw emotierapport in te vullen?" }}'
+            #Send notification to iOS devices
+            responseiOS = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
+            #Send notification to Android devices
+            responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
+        except Exception as e:
+            print(e)
+    
+    #if we have multiple services in the queue something is wrong, clear the queue before continuing
+    if len(s.queue) > 0:
+        stopNotifications()
+        
+    #Check time again in 1 hour
+    s.enter(3600, 1, sendNotifications, ())
+    s.run()
+    
 @application.errorhandler(404)
 def not_found(error=None):
     message = {
@@ -643,4 +771,5 @@ def not_found(error=None):
     return resp
 
 if __name__ == "__main__":
+    # refresh_fitbit_token_local(1)
     application.run()
