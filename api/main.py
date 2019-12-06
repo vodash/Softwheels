@@ -674,6 +674,19 @@ def sendNotifications():
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
+    return ""
+        
+@application.route('/stopNotifications', methods=['GET'])
+def stopNotifications():
+    #Remove first item from the queue
+    if len(s.queue) > 0:
+        s.cancel(s.queue[0]);
+    return ""
+
+
+@application.route('/notificationServiceIsRunning', methods=['GET'])
+def isRunning():
+    return str(not s.empty())
     
 @application.errorhandler(404)
 def not_found(error=None):
