@@ -15,15 +15,13 @@ export class PatientOverviewComponent implements OnInit {
 
   ngOnInit() {
       let i = 0;
-      let test =this.authService.getPatients()
+      this.authService.getPatients()
           .subscribe((value) => {
-              console.log(value);
-              for (let patient in value)
-              {
-                  this.patients.push(value[i])
-                   i++
+              for (const patients in value) {
+                  this.patients.push(value[i][1]);
+                  i++;
               }
-          });
+           });
 
   }
 

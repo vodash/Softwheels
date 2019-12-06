@@ -48,30 +48,17 @@ export class AuthService {
             console.log(user);
         }));
     }
-
     getPatients() {
-        let i = 0;
-        let patients = [];
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get(environment.adress + '/patients', { headers: autorization }).pipe(map( user => {
-            for (let users in user)
-            {
-                patients.push(user[i][1]);
-                console.log(patients)
-                i++;
-            }
-            return patients;
+        return this.http.get(environment.adress + '/patients', { headers: autorization }).pipe(map( users => {
+            return users;
         }));
     }
     getDataOnID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe(
-        // map( data => {
-        //     console.log(data);
-        // })
-        );
+        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe();
     }
 
 }
