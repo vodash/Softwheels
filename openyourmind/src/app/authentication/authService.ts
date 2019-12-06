@@ -3,7 +3,6 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {environment} from '../../htpp-conf';
 import {Router} from '@angular/router';
-import {Observable} from "rxjs";
 import {ChartData} from "../models/chartdata.model";
 
 @Injectable({
@@ -49,6 +48,22 @@ export class AuthService {
             console.log(user);
         }));
     }
+
+    getPatients() {
+        let i = 0;
+        let patients = [];
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/patients', { headers: autorization }).pipe(map( user => {
+            for (let users in user)
+            {
+                patients.push(user[i][1]);
+                console.log(patients)
+                i++;
+            }
+            return patients;
+        }));
+    }
     getDataOnID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
@@ -56,14 +71,6 @@ export class AuthService {
         // map( data => {
         //     console.log(data);
         // })
-        );
-    }
-    getPatientList() {
-        const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get(environment.adress + '/fake', { headers: autorization }).pipe(
-            // map( data => {
-            //     console.log(data);
-            // })
         );
     }
 
