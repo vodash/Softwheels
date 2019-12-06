@@ -7,7 +7,7 @@ from flaskext.mysql import MySQL
 import random
 import datetime
 import pymysql
-import requests, sched, time
+import requests, sched, time, threading
 from flask import jsonify
 from flask import flash, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -633,6 +633,26 @@ def deleteNote(user_id, note_id):
         conn.close()
 
 @application.route('/sendNotifications', methods=['GET'])
+def startThread():
+    #if we have multiple services in the queue something is wrong, clear the queue and start a new thread.
+    if len(s.queue) > 0:
+        stopNotifications()
+    
+    x = threading.Thread(target=sendNotifications, args=())
+    x.start()
+    return ""
+        
+@application.route('/stopNotifications', methods=['GET'])
+def stopNotifications():
+    #Remove all items from the queue
+    while len(s.queue) > 0:
+        s.cancel(s.queue[0]);
+    return ""
+
+@application.route('/notificationServiceIsRunning', methods=['GET'])
+def isRunning():
+    return str(not s.empty())
+    
 def sendNotifications():
     now = datetime.datetime.now()
     #Only send the notifications 3 times a day.
@@ -646,23 +666,14 @@ def sendNotifications():
             responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
         except Exception as e:
             print(e)
-            
+    
+    #if we have multiple services in the queue something is wrong, clear the queue before continuing
+    if len(s.queue) > 0:
+        stopNotifications()
+        
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
-    return ""
-        
-@application.route('/stopNotifications', methods=['GET'])
-def stopNotifications():
-    #Remove first item from the queue
-    if len(s.queue) > 0:
-        s.cancel(s.queue[0]);
-    return ""
-
-
-@application.route('/notificationServiceIsRunning', methods=['GET'])
-def isRunning():
-    return str(not s.empty())
     
 @application.errorhandler(404)
 def not_found(error=None):
