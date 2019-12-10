@@ -89,24 +89,24 @@ def refresh_fitbit_token_local(id):
     cursor = None
     url = 'https://api.fitbit.com/oauth2/token'
     headers = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": "Basic MjJCNVhYOmVjYzdiOWNmODk0ZjJhOTZiYzg4OWJkZjQxOTQwYTQ4"}
-
     try:
         conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("select refresh_token from fitbit_auth where id=%s", id)
-        refresh_token = cursor.fetchone()[0]
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT refresh_token FROM fitbit_auth WHERE patient_id=%s", id)
+        refresh_token = cursor.fetchone()["refresh_token"]
         data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
         req = requests.post(url, data=data, headers=headers)
         out=json.loads(req.text)
         # print(out)
         if "access_token" in out.keys():
-            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE id=%s"
+            print(2)
+            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE patient_id=%s"
             resp = (out["access_token"], out["refresh_token"], id)
             cursor.execute(sql, resp)
             conn.commit()
-            return ("Token refreshed successfully.")
+            return out["access_token"]
         else:
-            return ("An error occurred while refreshing FitBit access token.")
+            return ({"error","An error occurred while refreshing FitBit access token."})
     except Exception as e:
         print(e)
     finally:
@@ -723,7 +723,7 @@ def getFitbitToken(user_id):
     finally:
         cursor.close()
         conn.close
-def checkTokenValidity(access_token, id):
+def getValidFitbitToken(access_token, id):
     conn = None
     cursor = None
     try:
@@ -736,25 +736,8 @@ def checkTokenValidity(access_token, id):
         date = datetime.utcfromtimestamp(TokenExpire)
         testDate = datetime.utcfromtimestamp(TokenExpire +10)
         # if access_token is expired, refresh
-        if date < datetime.now():
-            # Get current refresh token
-            cursor.execute("SELECT refresh_token FROM fitbit_auth WHERE patient_id=%s", id)
-            refresh_token = cursor.fetchone()["refresh_token"]
-            # Refresh access token
-            url = 'https://api.fitbit.com/oauth2/token'
-            headers = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": "Basic MjJCNVhYOmVjYzdiOWNmODk0ZjJhOTZiYzg4OWJkZjQxOTQwYTQ4"}
-            data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
-            req = requests.post(url, data=data, headers=headers)
-            out=json.loads(req.text)
-            # Save new access token
-            if "access_token" in out.keys():
-                sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE patient_id=%s"
-                resp = (out["access_token"], out["refresh_token"], id)
-                cursor.execute(sql, resp)
-                conn.commit()
-                access_token = out["access_token"]
-            else:
-                raise ValueError ("An error occurred while refreshing FitBit access token.")
+        if date < testDate:
+            access_token = refresh_fitbit_token_local(id)
         return(access_token)
     except Exception as e:
         print(e)
