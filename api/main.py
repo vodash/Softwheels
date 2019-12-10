@@ -5,7 +5,8 @@ from datetime import timedelta
 from flask_cors import CORS
 from flaskext.mysql import MySQL
 import random
-import datetime
+from datetime import datetime
+import base64
 import pymysql
 import requests, sched, time, threading
 from flask import jsonify
@@ -88,24 +89,24 @@ def refresh_fitbit_token_local(id):
     cursor = None
     url = 'https://api.fitbit.com/oauth2/token'
     headers = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": "Basic MjJCNVhYOmVjYzdiOWNmODk0ZjJhOTZiYzg4OWJkZjQxOTQwYTQ4"}
-
     try:
         conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("select refresh_token from fitbit_auth where id=%s", id)
-        refresh_token = cursor.fetchone()[0]
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT refresh_token FROM fitbit_auth WHERE patient_id=%s", id)
+        refresh_token = cursor.fetchone()["refresh_token"]
         data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
         req = requests.post(url, data=data, headers=headers)
         out=json.loads(req.text)
         # print(out)
         if "access_token" in out.keys():
-            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE id=%s"
+            print(2)
+            sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE patient_id=%s"
             resp = (out["access_token"], out["refresh_token"], id)
             cursor.execute(sql, resp)
             conn.commit()
-            return ("Token refreshed successfully.")
+            return out["access_token"]
         else:
-            return ("An error occurred while refreshing FitBit access token.")
+            return ({"error","An error occurred while refreshing FitBit access token."})
     except Exception as e:
         print(e)
     finally:
@@ -671,8 +672,6 @@ def saveAccessToken():
             sql = "SELECT patient_id from fitbit_auth WHERE patient_id=%s"
             cursor.execute(sql, _patient_id)
             row = cursor.fetchone()
-            print(row)
-            print(_patient_id)
             # Check if patient id already exists, if so overwrite accesstoken and refreshtoken, else create new entry.
             if(row):
                 sql = "UPDATE fitbit_auth SET access_token = %s, refresh_token = %s WHERE patient_id = %s"
@@ -707,14 +706,42 @@ def getFitbitToken(user_id):
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
+            access_token = getValidFitbitToken(row["access_token"], user_id)            
             #only send Access code.
-            resp = jsonify(row)
-            resp.status_code = 200
+            resp = jsonify(access_token)
+            if access_token == "":
+                resp.status_code = 400 
+            else:
+                resp.status_code = 200
             return resp
         else:
             return not_found()
     except Exception as e:
         print(e)
+        resp = jsonify("Api threw exception")
+        resp.status_code = 400
+    finally:
+        cursor.close()
+        conn.close
+def getValidFitbitToken(access_token, id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # Decode access token to get expire date.
+        decode = base64.urlsafe_b64decode(access_token+"==")
+        decodedStr = str(decode, "latin-1")
+        TokenExpire = int(decodedStr.split(',')[5].split(':')[1])
+        date = datetime.utcfromtimestamp(TokenExpire)
+        # testDate = datetime.utcfromtimestamp(TokenExpire +10)
+        # if access_token is expired, refresh
+        if date < datetime.now():
+            access_token = refresh_fitbit_token_local(id)
+        return(access_token)
+    except Exception as e:
+        print(e)
+        return("")
     finally:
         cursor.close()
         conn.close
