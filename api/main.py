@@ -734,9 +734,9 @@ def getValidFitbitToken(access_token, id):
         decodedStr = str(decode, "latin-1")
         TokenExpire = int(decodedStr.split(',')[5].split(':')[1])
         date = datetime.utcfromtimestamp(TokenExpire)
-        testDate = datetime.utcfromtimestamp(TokenExpire +10)
+        # testDate = datetime.utcfromtimestamp(TokenExpire +10)
         # if access_token is expired, refresh
-        if date < testDate:
+        if date < datetime.now():
             access_token = refresh_fitbit_token_local(id)
         return(access_token)
     except Exception as e:
