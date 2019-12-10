@@ -706,7 +706,7 @@ def getFitbitToken(user_id):
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = checkTokenValidity(row["access_token"], user_id)            
+            access_token = getValidFitbitToken(row["access_token"], user_id)            
             #only send Access code.
             resp = jsonify(access_token)
             if access_token == "":
@@ -745,8 +745,6 @@ def getValidFitbitToken(access_token, id):
     finally:
         cursor.close()
         conn.close
-
-
 
 @application.route('/sendNotifications', methods=['GET'])
 def startThread():
