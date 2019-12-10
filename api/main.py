@@ -521,18 +521,15 @@ def getEmotionReportNotes(emotionReport_id):
         cursor.close()
         conn.close()
 
-@application.route('/getEmotionReportPeriod')
-def getEmotionReportPeriod():
+@application.route('/getEmotionReportPeriod/<int:patient_id>/date/<string:start_date>/<string:end_date>')
+def getEmotionReportPeriod(patient_id, start_date, end_date):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        _patient_id = request.json['patient_id']
-        _start_date = request.json['start_date']
-        _end_date = request.json['end_date']
-        data = (_patient_id, _start_date, _end_date)
-        cursor.execute("SELECT * FROM emotierapport WHERE patient_id=%s AND date BETWEEN %s AND %s", data)
+        data = (patient_id, end_date, start_date)
+        cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date BETWEEN %s AND %s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
@@ -642,7 +639,6 @@ def deleteNote(user_id, note_text):
             sql = "DELETE FROM patient_note WHERE note_id=(SELECT id FROM note WHERE text=%s) AND patient_id=%s"
             data = (note_text, user_id)
             cursor.execute(sql, data)
-
             conn.commit()
             resp = jsonify('Note deleted!')
             resp.status_code = 200
