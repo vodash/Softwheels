@@ -99,7 +99,6 @@ def refresh_fitbit_token_local(id):
         out=json.loads(req.text)
         # print(out)
         if "access_token" in out.keys():
-            print(2)
             sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE patient_id=%s"
             resp = (out["access_token"], out["refresh_token"], id)
             cursor.execute(sql, resp)
@@ -138,8 +137,7 @@ def login():
             resp = jsonify('Username or password is missing')
             return resp
     except Exception as e:
-        resp = jsonify('error')
-        return resp
+        print(e)
     finally:
         cursor.close()
 
@@ -468,15 +466,13 @@ def saveEmotionReport():
                 data = (emotionID, note)
                 cursor.execute(sql, data)
                 conn.commit()
-            rows = cursor.fetchall()
             resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
             return resp
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify("Emotionreport could not be saved.")
-        resp.status_code = 401
+        print(e)
     finally:
         cursor.close()
         conn.close()
@@ -678,7 +674,7 @@ def saveAccessToken():
                 data = (_access_token, _refresh_token, _patient_id)
             else:
                 sql = "INSERT INTO fitbit_auth(patient_id, access_token, refresh_token, token_type) VALUES(%s, %s, %s, %s)"
-                data = (_patient_id, _access_token, _refresh_token, _token_type)   
+                data = (_patient_id, _access_token, _refresh_token, _token_type)
             cursor.execute(sql, data)
 
             conn.commit()
@@ -706,11 +702,11 @@ def getFitbitToken(user_id):
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = getValidFitbitToken(row["access_token"], user_id)            
+            access_token = getValidFitbitToken(row["access_token"], user_id)
             #only send Access code.
             resp = jsonify(access_token)
             if access_token == "":
-                resp.status_code = 400 
+                resp.status_code = 400
             else:
                 resp.status_code = 200
             return resp
@@ -751,11 +747,11 @@ def startThread():
     #if we have multiple services in the queue something is wrong, clear the queue and start a new thread.
     if len(s.queue) > 0:
         stopNotifications()
-    
+
     x = threading.Thread(target=sendNotifications, args=())
     x.start()
     return ""
-        
+
 @application.route('/stopNotifications', methods=['GET'])
 def stopNotifications():
     #Remove all items from the queue
@@ -766,29 +762,29 @@ def stopNotifications():
 @application.route('/notificationServiceIsRunning', methods=['GET'])
 def isRunning():
     return str(not s.empty())
-    
+
 def sendNotifications():
     now = datetime.datetime.now()
     #Only send the notifications 3 times a day.
-    if now.hour == 10 or now.hour == 16 or now.hour == 22:
+    if now.hour in (10,16,22):
         try:
             headers = {'accept': 'application/json','X-API-Token': '43c80985e6f73b4a082459f78ca7b1f2b911ac6a','Content-Type': 'application/json',}
             data = '{ "notification_content": { "name": "EmotionReport", "title": "Emotierapport", "body": "Vergeet u niet uw emotierapport in te vullen?" }}'
             #Send notification to iOS devices
-            responseiOS = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
+            requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
             #Send notification to Android devices
-            responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
+            requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
         except Exception as e:
             print(e)
-    
+
     #if we have multiple services in the queue something is wrong, clear the queue before continuing
     if len(s.queue) > 0:
         stopNotifications()
-        
+
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
-    
+
 @application.errorhandler(404)
 def not_found(error=None):
     message = {
