@@ -183,15 +183,7 @@ def isAdmin():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
-        rows = cursor.fetchone()
-        if rows[0]:
-            resp = "True"
-            jsonify(resp)
-            return jsonify(resp)
-        else:
-            resp = "False"
-            jsonify(resp)
-            return jsonify(resp)
+        return jsonify(cursor.fetchone()[0] == True)
     except Exception as e:
         print(e)
     finally:
@@ -328,7 +320,6 @@ def add_patient():
         _wachtwoord = _json['wachtwoord']
         _bsn = _json['bsn']
         if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and _bsn and request.method == 'POST':
-            print("post enzo")
             # do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
             # insert patient info into db
@@ -405,7 +396,6 @@ def patients():
 
         cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", str(current_identity))
         rows = cursor.fetchall()
-        print(rows)
         resp = jsonify(rows)
         return resp
     except Exception as e:
