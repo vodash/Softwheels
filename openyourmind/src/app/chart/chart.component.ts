@@ -11,6 +11,7 @@ import {ChartData} from '../models/chartdata.model';
 
 export class ChartComponent implements OnInit {
     Chartdata: ChartData[];
+    xaxis = [];
 
     public options: any = {
         chart: {
@@ -44,7 +45,7 @@ export class ChartComponent implements OnInit {
             }
         ,
         xAxis: {
-                    categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+                    categories: this.xaxis
         },
         series: [
             {
@@ -66,9 +67,17 @@ export class ChartComponent implements OnInit {
         this.authService.getDataOnID().subscribe((data => {
             this.Chartdata = data;
             console.log(this.Chartdata['hoi'][0]['data']);
-            let charter = Highcharts.chart('container2', this.options);
+            const charter = Highcharts.chart('container2', this.options);
             charter.series[0].setData(this.Chartdata['hoi'][0]['data']);
             charter.series[1].setData(this.Chartdata['hoi'][1]['data']);
         }));
+    }
+    // TODO: update this function to work with the new way we want to show it (with dates)
+    xAxisData(steps) {
+        console.log('clicked');
+        if (steps === 'W') {
+            this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+            console.log('hier');
+        }
     }
 }

@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {environment} from '../../htpp-conf';
 import {Router} from '@angular/router';
-import {ChartData} from "../models/chartdata.model";
+import {ChartData} from '../models/chartdata.model';
 
 @Injectable({
     providedIn: 'root'
@@ -45,7 +45,7 @@ export class AuthService {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
         return this.http.get(environment.adress + '/isAdmin', { headers: autorization }).pipe(map( user => {
-            console.log(user);
+            return user;
         }));
     }
     getPatients() {

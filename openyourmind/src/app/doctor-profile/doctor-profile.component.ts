@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthService} from '../authentication/authService';
 
 @Component({
   selector: 'app-doctor-profile',
@@ -8,14 +7,10 @@ import {AuthService} from '../authentication/authService';
 })
 export class DoctorProfileComponent implements OnInit {
 
-  constructor(private authService: AuthService
+  constructor(
   ) {}
 
   ngOnInit() {
-      this.authService.getUserID()
-          .subscribe(
-              () => {}
-          );
   }
 
 }

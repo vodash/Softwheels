@@ -17,6 +17,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {AuthGuardService} from './authentication/auth-guard.service';
 import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
 import { PatientCreationComponent } from './patient-creation/patient-creation.component';
+import { AdminMenuComponent } from './admin-menu/admin-menu.component';
 
 
 
@@ -30,7 +31,8 @@ import { PatientCreationComponent } from './patient-creation/patient-creation.co
         DoctorProfileComponent,
         PatientProfileComponent,
         PatientOverviewComponent,
-        PatientCreationComponent
+        PatientCreationComponent,
+        AdminMenuComponent
     ],
     imports: [
         BrowserModule,

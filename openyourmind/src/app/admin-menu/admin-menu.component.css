@@ -1,0 +1,104 @@
+:host {
+    background: #155a7d;
+    color: #d7e4e8;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: 0;
+    min-width: 250px;
+    z-index: 8888;
+    font-family: 'Roboto', sans-serif;
+    padding: 15px
+}
+
+.active{
+    border-color: #ff6f61 !important;
+}
+
+.main-nav {
+    font-size: 19px;
+    line-height: 3;
+    font-weight: 400;
+    margin-top: 30px;
+    padding: 0 15px;
+    list-style: none;
+    width: 100%;
+}
+
+.main-nav-item {
+    cursor: pointer;
+}
+
+.privacy {
+    position: absolute;
+    bottom: 75px;
+    font-size: 12pt;
+    color: lightgray;
+}
+
+.footer {
+    position: absolute;
+    bottom: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+}
+
+.profilephoto{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    margin: 14% 12% 0 9%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border:solid 10px #ff6f61;
+    -webkit-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+}
+
+.profilepic{
+    display: inline;
+    margin: 0 auto;
+    height: auto;
+    width: 100%;
+    object-fit: cover;
+}
+
+.navstyle{
+    border: 2px #52b2d5 solid;
+    padding-bottom: 5px;
+    color: #fff;
+}
+
+.navstyle:hover{
+    border-color: #ffffff;
+}
+
+.main-nav>a{
+    display: block;
+    font-size: 22px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 10px;
+    margin-top: 13px;
+}
+.welcome{
+    padding-top: 17%
+}
+
+.privacy{
+    margin-left: 30%;
+}
+
+.btn-customlog{
+    color: #fff;
+    border-bottom: solid #fff 1px;
+}
+
+btn.focus, .btn:focus {
+    outline: 0 !important;
+    box-shadow: none !important;
+}
