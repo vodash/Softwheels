@@ -155,15 +155,7 @@ def isAdmin():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
-        rows = cursor.fetchone()
-        if rows[0]:
-            resp = "True"
-            jsonify(resp)
-            return jsonify(resp)
-        else:
-            resp = "False"
-            jsonify(resp)
-            return jsonify(resp)
+        return jsonify(cursor.fetchone()[0] == True)
     except Exception as e:
         print(e)
     finally:
@@ -300,7 +292,6 @@ def add_patient():
         _wachtwoord = _json['wachtwoord']
         _bsn = _json['bsn']
         if _voornaam and _achternaam and _email and _geboortedatum and _geslacht and _wachtwoord and _bsn and request.method == 'POST':
-            print("post enzo")
             # do not save password as a plain text
             _hashed_password = generate_password_hash(_wachtwoord)
             # insert patient info into db
@@ -377,7 +368,6 @@ def patients():
 
         cursor.execute("select * from patient p join patient_professional pa on pa.patient_id = p.id join professional pr on pr.id = pa.professional_id where pr.id=%s", str(current_identity))
         rows = cursor.fetchall()
-        print(rows)
         resp = jsonify(rows)
         return resp
     except Exception as e:
@@ -438,7 +428,6 @@ def saveEmotionReport():
                 data = (emotionID, note)
                 cursor.execute(sql, data)
                 conn.commit()
-            rows = cursor.fetchall()
             resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
         else:
@@ -733,11 +722,11 @@ def startThread():
     #if we have multiple services in the queue something is wrong, clear the queue and start a new thread.
     if len(s.queue) > 0:
         stopNotifications()
-    
+
     x = threading.Thread(target=sendNotifications, args=())
     x.start()
     return ""
-        
+
 @application.route('/stopNotifications', methods=['GET'])
 def stopNotifications():
     #Remove all items from the queue
@@ -748,29 +737,29 @@ def stopNotifications():
 @application.route('/notificationServiceIsRunning', methods=['GET'])
 def isRunning():
     return str(not s.empty())
-    
+
 def sendNotifications():
     now = datetime.datetime.now()
     #Only send the notifications 3 times a day.
-    if now.hour == 10 or now.hour == 16 or now.hour == 22:
+    if now.hour in (10,16,22):
         try:
             headers = {'accept': 'application/json','X-API-Token': '43c80985e6f73b4a082459f78ca7b1f2b911ac6a','Content-Type': 'application/json',}
             data = '{ "notification_content": { "name": "EmotionReport", "title": "Emotierapport", "body": "Vergeet u niet uw emotierapport in te vullen?" }}'
             #Send notification to iOS devices
-            responseiOS = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
+            requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-iOS/push/notifications', headers=headers, data=data)
             #Send notification to Android devices
-            responseAndroid = requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
+            requests.post('https://api.appcenter.ms/v0.1/apps/moveyourmind/MoveYourMind-Android/push/notifications', headers=headers, data=data)
         except Exception as e:
             print(e)
-    
+
     #if we have multiple services in the queue something is wrong, clear the queue before continuing
     if len(s.queue) > 0:
         stopNotifications()
-        
+
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
-    
+
 @application.errorhandler(404)
 def not_found(error=None):
     message = {
