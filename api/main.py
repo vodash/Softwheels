@@ -17,18 +17,22 @@ import json
 mysql = MySQL()
 s = sched.scheduler(time.time, time.sleep)
 
-application = Flask(__name__)
-application.debug = True
-application.config['SECRET_KEY'] = 'superdupergeheimesleutel'
-application.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
-# MySQL configurations
-application.config['MYSQL_DATABASE_USER'] = 'mym'
-application.config['MYSQL_DATABASE_PASSWORD'] = 'blabladingeshoi'
-application.config['MYSQL_DATABASE_DB'] = 'mym'
-application.config['MYSQL_DATABASE_HOST'] = 'aitai.nl'
-application.config['MYSQL_DATABASE_PORT'] = 14163
-mysql.init_app(application)
-CORS(application)
+def create_application():
+    application = Flask(__name__)
+    application.debug = True
+    application.config['SECRET_KEY'] = 'superdupergeheimesleutel'
+    application.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
+    # MySQL configurations
+    application.config['MYSQL_DATABASE_USER'] = 'mym'
+    application.config['MYSQL_DATABASE_PASSWORD'] = 'blabladingeshoi'
+    application.config['MYSQL_DATABASE_DB'] = 'mym'
+    application.config['MYSQL_DATABASE_HOST'] = 'aitai.nl'
+    application.config['MYSQL_DATABASE_PORT'] = 14163
+    mysql.init_app(application)
+    CORS(application)
+    return application
+
+application = create_application()
 
 class User(object):
     def __init__(self, id, email, password=0):
@@ -774,6 +778,10 @@ def sendNotifications():
     #Check time again in 1 hour
     s.enter(3600, 1, sendNotifications, ())
     s.run()
+
+@application.route('/blabla')
+def hoi():
+    return 'hoi'
 
 @application.errorhandler(404)
 def not_found(error=None):
