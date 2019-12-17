@@ -31,10 +31,11 @@ mysql.init_app(application)
 CORS(application)
 
 class User(object):
-    def __init__(self, id, email, password=0):
+    def __init__(self, id, email, password=0, userType="none"):
         self.id = id
         self.email = email
         self.password = password
+        self.userType = userType
 
     def __str__(self):
         return "User(id='%s')" % self.id
@@ -48,12 +49,12 @@ def authenticate(username, password):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("select wachtwoord, id, email from professional where email=%s", username)
+            cursor.execute("select wachtwoord, id, email, 'professional' from professional where email=%s UNION select wachtwoord, id, email, 'patient' from patient where email=%s", (username, username))
             row = cursor.fetchone()
             if check_password_hash(row[0], password):
                 global user_id
                 user_id = row[1]
-                user = User(row[1], row[2])
+                user = User(row[1], row[2], row[3])
                 return user
             else:
                 return None
@@ -97,51 +98,20 @@ def refresh_fitbit_token_local(id):
         data = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
         req = requests.post(url, data=data, headers=headers)
         out=json.loads(req.text)
-        # print(out)
+        print(out)
         if "access_token" in out.keys():
-            print(2)
             sql = "UPDATE fitbit_auth SET access_token=%s, refresh_token=%s WHERE patient_id=%s"
             resp = (out["access_token"], out["refresh_token"], id)
             cursor.execute(sql, resp)
             conn.commit()
             return out["access_token"]
         else:
-            return ({"error","An error occurred while refreshing FitBit access token."})
+            return {"error","An error occurred while refreshing FitBit access token."}
     except Exception as e:
         print(e)
     finally:
         cursor.close()
         conn.close()
-
-@application.route('/loginPatient', methods=['POST'])
-def login():
-    conn = None
-    cursor = None
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        _json = request.json
-        _username = _json['email']
-        _password = _json['wachtwoord']
-        if _username and _password:
-            cursor.execute("select wachtwoord, id, email from patient where email=%s", _username)
-            row = cursor.fetchone()
-            if check_password_hash(row[0], _password):
-                resp = jsonify({"id": row[1]})
-                resp.status_code = 200
-                return resp
-            else:
-                resp = jsonify("Login failed!")
-                resp.status_code = 401
-                return resp
-        else:
-            resp = jsonify('Username or password is missing')
-            return resp
-    except Exception as e:
-        resp = jsonify('error')
-        return resp
-    finally:
-        cursor.close()
 
 @application.route('/add', methods=['POST'])
 @jwt_required()
@@ -439,11 +409,11 @@ def test():
             conn.close()
 
 @application.route('/saveEmotionReport', methods=['POST'])
+@jwt_required()
 def saveEmotionReport():
     conn = None
     cursor = None
     try:
-        _patient_id = request.json['PatientId']
         _date = request.json['Date']
         _partofday = request.json['PartOfDay']
         _painlevel = request.json['PainLevel']
@@ -454,9 +424,9 @@ def saveEmotionReport():
         _tired = request.json['Tired']
         _feeling = request.json['EmoticonType']
         _notes = request.json['Notes']
-        if _patient_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
+        if user_id and _date and _partofday and _painlevel and _angry and _happy and _energetic and _tired and _scared and _feeling and request.method == "POST":
             sql = "INSERT INTO emotierapport(patient_id, date, dagdeel, pijnniveau, boos, blij, energiek, moe, bang, gevoel) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            data = (_patient_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
+            data = (user_id, _date, _partofday, _painlevel, _angry, _happy, _energetic, _tired, _scared, _feeling)
             conn = mysql.connect()
             cursor = conn.cursor()
 
@@ -471,38 +441,40 @@ def saveEmotionReport():
             rows = cursor.fetchall()
             resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
-            return resp
         else:
             return not_found()
     except Exception as e:
         resp = jsonify("Emotionreport could not be saved.")
-        resp.status_code = 401
+        resp.status_code = 400
     finally:
+        return resp
         cursor.close()
         conn.close()
 
 
-@application.route('/emotionReport/<int:patient_id>/date/<string:date>')
-def getEmotionReport(patient_id, date):
+@application.route('/emotionReport/date/<string:date>')
+@jwt_required()
+def getEmotionReport(date):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        data = (patient_id, date)
+        data = (user_id, date)
         cursor.execute("SELECT id, patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date=%s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
-        return resp
     except Exception as e:
         resp = jsonify(e)
         resp.status_code = 402
     finally:
+        return resp
         cursor.close()
         conn.close()
 
 @application.route('/emotionReportNotes/<int:emotionReport_id>')
+@jwt_required()
 def getEmotionReportNotes(emotionReport_id):
     conn = None
     cursor = None
@@ -513,44 +485,47 @@ def getEmotionReportNotes(emotionReport_id):
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
-        return resp
     except Exception as e:
         resp = jsonify(e)
-        resp.status_code = 402
+        resp.status_code = 400
     finally:
+        return resp
         cursor.close()
         conn.close()
 
-@application.route('/getEmotionReportPeriod/<int:patient_id>/date/<string:start_date>/<string:end_date>')
-def getEmotionReportPeriod(patient_id, start_date, end_date):
+@application.route('/getEmotionReportPeriod/date/<string:start_date>/<string:end_date>')
+@jwt_required()
+def getEmotionReportPeriod(start_date, end_date):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        data = (patient_id, end_date, start_date)
+        data = (user_id, start_date, end_date)
         cursor.execute("SELECT patient_id AS PatientId, date AS Date, dagdeel AS PartOfDay, pijnniveau AS PainLevel, boos AS Angry, blij AS Happy, energiek AS Energetic, moe AS Tired, bang AS Scared, gevoel AS EmoticonType FROM emotierapport WHERE patient_id=%s AND date BETWEEN %s AND %s", data)
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
-        return resp
     except Exception as e:
         print(e)
+        resp = jsonify(e)
+        resp.status_code = 400
     finally:
+        return resp
         cursor.close()
         conn.close()
 
 @application.route('/emotionReportExists')
+@jwt_required()
 def getEmotionReportExists():
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        _patient_id = request.json['patient_id']
         _date = request.json['date']
         _partofday = request.json['partofday']
-        data = (_patient_id, _date, _partofday)
+        data = (user_id, _date, _partofday)
         cursor.execute("SELECT * FROM emotierapport WHERE patient_id=%s AND date=%s AND dagdeel=%s", data)
         row = cursor.fetchone()
         if row:
@@ -558,100 +533,104 @@ def getEmotionReportExists():
         else:
             resp = jsonify("false")
         resp.status_code = 200
-        return resp
     except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 400
         print(e)
     finally:
+        return resp
         cursor.close()
         conn.close()
 
 @application.route('/saveNewNote', methods=['POST'])
+@jwt_required()
 def saveNewNote():
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        print(request.json)
         _json = request.json
         _note = _json['note']
-        _patient_id = _json['patient_id']
 
-        if _note and _patient_id and request.method == "POST":
+        if _note and user_id and request.method == "POST":
             sql = "INSERT INTO note(text) VALUES(%s)"
             data = (_note)
             cursor.execute(sql, data)
-
-            sql = "SELECT id from note WHERE text=%s"
-            cursor.execute(sql, data)
-
-            row = cursor.fetchone()
+            note_id = cursor.lastrowid
             sql = "INSERT INTO patient_note(patient_id, note_id) VALUES(%s, %s)"
-            data = (_patient_id, row[0])
+            data = (user_id, note_id)
 
             cursor.execute(sql, data)
             conn.commit()
 
             resp = jsonify('Note added')
             resp.status_code = 200
-            return resp
         else:
             return not_found()
     except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 400
         print(e)
     finally:
+        return resp
         cursor.close()
         conn.close()
 
-@application.route('/getNotes/<int:id>', methods=['GET'])
-def getNotes(id):
+@application.route('/getNotes', methods=['GET'])
+@jwt_required()
+def getNotes():
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        if id and request.method == "GET":
+        if user_id and request.method == "GET":
             sql = "SELECT patient_note.note_id, note.text FROM patient_note, note WHERE patient_id=%s AND note.id = patient_note.note_id"
-            data = (id)
+            data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchall()
             resp = jsonify(row)
             resp.status_code = 200
-            return resp
         else:
             return not_found()
     except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 400
         print(e)
     finally:
+        return resp
         cursor.close()
         conn.close()
 
-@application.route('/user/<int:user_id>/note/<string:note_text>', methods=['DELETE'])
-def deleteNote(user_id, note_text):
+@application.route('/user/<int:note_id>', methods=['DELETE'])
+@jwt_required()
+def deleteNote(note_id):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        print(note_text)
-        print(user_id)
         if user_id and note_text and request.method == "DELETE":
-            sql = "DELETE FROM patient_note WHERE note_id=(SELECT id FROM note WHERE text=%s) AND patient_id=%s"
-            data = (note_text, user_id)
+            sql = "DELETE FROM patient_note WHERE note_id=%s AND patient_id=%s"
+            data = (note_id, user_id)
             cursor.execute(sql, data)
             conn.commit()
             resp = jsonify('Note deleted!')
             resp.status_code = 200
-            return resp
         else:
             return not_found()
     except Exception as e:
+        resp = jsonify(e)
+        resp.status_code = 400
         print(e)
     finally:
+        return resp
         cursor.close()
         conn.close()
 
 @application.route('/saveAccessToken', methods=['POST'])
+@jwt_required()
 def saveAccessToken():
     conn = None
     cursor = None
@@ -659,22 +638,21 @@ def saveAccessToken():
         conn = mysql.connect()
         cursor = conn.cursor()
         _json = request.json
-        _patient_id = _json['patient_id']
         _access_token = _json['access_token']
         _refresh_token = _json['refresh_token']
         _token_type = _json['token_type']
 
-        if _patient_id and _access_token and _refresh_token and _token_type and request.method == "POST":
+        if user_id and _access_token and _refresh_token and _token_type and request.method == "POST":
             sql = "SELECT patient_id from fitbit_auth WHERE patient_id=%s"
-            cursor.execute(sql, _patient_id)
+            cursor.execute(sql, user_id)
             row = cursor.fetchone()
             # Check if patient id already exists, if so overwrite accesstoken and refreshtoken, else create new entry.
             if(row):
                 sql = "UPDATE fitbit_auth SET access_token = %s, refresh_token = %s WHERE patient_id = %s"
-                data = (_access_token, _refresh_token, _patient_id)
+                data = (_access_token, _refresh_token, user_id)
             else:
                 sql = "INSERT INTO fitbit_auth(patient_id, access_token, refresh_token, token_type) VALUES(%s, %s, %s, %s)"
-                data = (_patient_id, _access_token, _refresh_token, _token_type)   
+                data = (user_id, _access_token, _refresh_token, _token_type)   
             cursor.execute(sql, data)
 
             conn.commit()
@@ -686,12 +664,15 @@ def saveAccessToken():
             return not_found()
     except Exception as e:
         print(e)
+        resp = jsonify(e)
+        resp.status_code = 400
     finally:
         cursor.close()
         conn.close()
 
-@application.route('/getFitbitToken/<int:user_id>', methods=['GET'])
-def getFitbitToken(user_id):
+@application.route('/getFitbitToken', methods=['GET'])
+@jwt_required()
+def getFitbitToken():
     conn = None
     cursor = None
     try:
@@ -702,10 +683,16 @@ def getFitbitToken(user_id):
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = getValidFitbitToken(row["access_token"], user_id)            
+            access_token = getValidFitbitToken(row["access_token"])    
             #only send Access code.
-            resp = jsonify(access_token)
+            if len(access_token) == 260:
+                resp = jsonify(access_token)
+            else:
+                resp = jsonify(error="Er ging iets fout met het verversen van de fitbit gegevens, probeer opnieuw te autoriseren.")
+                resp.status_code = 400
+                return resp
             if access_token == "":
+                resp = jsonify(error="Er ging iets fout met het verversen van de fitbit gegevens, probeer opnieuw te autoriseren.")
                 resp.status_code = 400 
             else:
                 resp.status_code = 200
@@ -713,13 +700,12 @@ def getFitbitToken(user_id):
         else:
             return not_found()
     except Exception as e:
-        print(e)
         resp = jsonify("Api threw exception")
         resp.status_code = 400
     finally:
         cursor.close()
         conn.close
-def getValidFitbitToken(access_token, id):
+def getValidFitbitToken(access_token):
     conn = None
     cursor = None
     try:
@@ -733,11 +719,11 @@ def getValidFitbitToken(access_token, id):
         # testDate = datetime.utcfromtimestamp(TokenExpire +10)
         # if access_token is expired, refresh
         if date < datetime.now():
-            access_token = refresh_fitbit_token_local(id)
+            access_token = refresh_fitbit_token_local(user_id)
         return(access_token)
     except Exception as e:
         print(e)
-        return("")
+        return(e)
     finally:
         cursor.close()
         conn.close
