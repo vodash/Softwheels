@@ -603,17 +603,17 @@ def getNotes():
         cursor.close()
         conn.close()
 
-@application.route('/user/<int:note_id>', methods=['DELETE'])
+@application.route('/note/<string:note_text>', methods=['DELETE'])
 @jwt_required()
-def deleteNote(note_id):
+def deleteNote(note_text):
     conn = None
     cursor = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
         if user_id and note_text and request.method == "DELETE":
-            sql = "DELETE FROM patient_note WHERE note_id=%s AND patient_id=%s"
-            data = (note_id, user_id)
+            sql = "DELETE FROM patient_note WHERE note_id=(SELECT note_id FROM note WHERE text=%s) AND patient_id=%s"
+            data = (note_text, user_id)
             cursor.execute(sql, data)
             conn.commit()
             resp = jsonify('Note deleted!')
