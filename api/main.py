@@ -1,11 +1,10 @@
 from flask import Flask
 from flask_jwt import JWT, jwt_required, current_identity
 from werkzeug.security import safe_str_cmp
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask_cors import CORS
 from flaskext.mysql import MySQL
 import random
-from datetime import datetime
 import base64
 import pymysql
 import requests, sched, time, threading
@@ -340,7 +339,7 @@ def disablepatient():
         # if above is true:
         if row:
             sql  ="update patient set uitgeschakeld=%s where id=%s"
-            data = (datetime.datetime.now(), _id)
+            data = (datetime.now(), _id)
             cursor.execute(sql, data)
             conn.commit()
             resp = jsonify('User disabled successfully!')
@@ -433,10 +432,8 @@ def saveEmotionReport():
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify("Emotionreport could not be saved.")
-        resp.status_code = 400
+        print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -455,10 +452,8 @@ def getEmotionReport(date):
         resp = jsonify(row)
         resp.status_code = 200
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 402
+        print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -475,10 +470,8 @@ def getEmotionReportNotes(emotionReport_id):
         resp = jsonify(row)
         resp.status_code = 200
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 400
+        print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -497,10 +490,7 @@ def getEmotionReportPeriod(start_date, end_date):
         resp.status_code = 200
     except Exception as e:
         print(e)
-        resp = jsonify(e)
-        resp.status_code = 400
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -523,11 +513,8 @@ def getEmotionReportExists():
             resp = jsonify("false")
         resp.status_code = 200
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 400
         print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -558,11 +545,8 @@ def saveNewNote():
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 400
         print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -584,11 +568,8 @@ def getNotes():
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 400
         print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -610,11 +591,8 @@ def deleteNote(note_text):
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify(e)
-        resp.status_code = 400
         print(e)
     finally:
-        return resp
         cursor.close()
         conn.close()
 
@@ -641,7 +619,7 @@ def saveAccessToken():
                 data = (_access_token, _refresh_token, user_id)
             else:
                 sql = "INSERT INTO fitbit_auth(patient_id, access_token, refresh_token, token_type) VALUES(%s, %s, %s, %s)"
-                data = (user_id, _access_token, _refresh_token, _token_type)   
+                data = (user_id, _access_token, _refresh_token, _token_type)
             cursor.execute(sql, data)
 
             conn.commit()
@@ -672,7 +650,7 @@ def getFitbitToken():
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = getValidFitbitToken(row["access_token"])    
+            access_token = getValidFitbitToken(row["access_token"])
             #only send Access code.
             if len(access_token) == 260:
                 resp = jsonify(access_token)
@@ -682,15 +660,14 @@ def getFitbitToken():
                 return resp
             if access_token == "":
                 resp = jsonify(error="Er ging iets fout met het verversen van de fitbit gegevens, probeer opnieuw te autoriseren.")
-                resp.status_code = 400 
+                resp.status_code = 400
             else:
                 resp.status_code = 200
             return resp
         else:
             return not_found()
     except Exception as e:
-        resp = jsonify("Api threw exception")
-        resp.status_code = 400
+        print(e)
     finally:
         cursor.close()
         conn.close
@@ -739,7 +716,7 @@ def isRunning():
     return str(not s.empty())
 
 def sendNotifications():
-    now = datetime.datetime.now()
+    now = datetime.now()
     #Only send the notifications 3 times a day.
     if now.hour in (10,16,22):
         try:
