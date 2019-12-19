@@ -429,6 +429,7 @@ def saveEmotionReport():
                 conn.commit()
             resp = jsonify("Emotionreport saved.")
             resp.status_code = 200
+            return resp
         else:
             return not_found()
     except Exception as e:
@@ -451,6 +452,7 @@ def getEmotionReport(date):
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
+        return resp
     except Exception as e:
         print(e)
     finally:
@@ -469,6 +471,7 @@ def getEmotionReportNotes(emotionReport_id):
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
+        return resp
     except Exception as e:
         print(e)
     finally:
@@ -488,6 +491,7 @@ def getEmotionReportPeriod(start_date, end_date):
         row = cursor.fetchall()
         resp = jsonify(row)
         resp.status_code = 200
+        return resp
     except Exception as e:
         print(e)
     finally:
@@ -512,6 +516,7 @@ def getEmotionReportExists():
         else:
             resp = jsonify("false")
         resp.status_code = 200
+        return resp
     except Exception as e:
         print(e)
     finally:
@@ -542,6 +547,7 @@ def saveNewNote():
 
             resp = jsonify('Note added')
             resp.status_code = 200
+            return resp
         else:
             return not_found()
     except Exception as e:
@@ -565,6 +571,7 @@ def getNotes():
             row = cursor.fetchall()
             resp = jsonify(row)
             resp.status_code = 200
+            return resp
         else:
             return not_found()
     except Exception as e:
@@ -588,6 +595,7 @@ def deleteNote(note_text):
             conn.commit()
             resp = jsonify('Note deleted!')
             resp.status_code = 200
+            return resp
         else:
             return not_found()
     except Exception as e:
