@@ -19,7 +19,7 @@ s = sched.scheduler(time.time, time.sleep)
 application = Flask(__name__)
 application.debug = True
 application.config['SECRET_KEY'] = 'superdupergeheimesleutel'
-application.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
+application.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=2592000)
 # MySQL configurations
 application.config['MYSQL_DATABASE_USER'] = 'mym'
 application.config['MYSQL_DATABASE_PASSWORD'] = 'blabladingeshoi'
