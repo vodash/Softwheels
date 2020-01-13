@@ -255,13 +255,18 @@ def delete_user(id):
 @application.route('/fake')
 @jwt_required()
 def fake_data():
-    data = [ round(random.normalvariate(8, .1), 1) for i in range(14) ]
+    # val = [ round(random.normalvariate(8, .1), 1) for i in range(40) ]
+    val = [ random.randint(1, 100) for i in range(40) ]
+    date = [ int(time.time()*1000)+random.randint(100000000, 50000000000) for i in range(20) ]
+    date = sorted(date)
+    date = date+date
+    data = tuple(zip(date, val))
     message = {
         'hoi':[
             {'name': 'Yomom',
-             'data': data[:7]},
+             'data': (data[:20])},
             {'name': 'Isfat',
-             'data': data[7:]}
+             'data': (data[20:])}
         ]
     }
     resp = jsonify(message)
