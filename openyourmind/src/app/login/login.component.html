@@ -2,15 +2,16 @@
     <div class="container">
         <form class="text-center formmarg" [formGroup]="form">
                 <div class=" col-md-8 col-offset-2">
+                    <img class='col-md-8' src="../../assets/images/logo.svg" alt="Open Your Mind">
                     <div class="whitebox">
-                        <h1 class="bluetext">Log in</h1>
+                        <h1 class="bluetext">Log In</h1>
                         <input class="form-control col-md-10 offset-1 mb-4 logform"
                                id="defaultRegisterFormEmail"
                                placeholder="Username" formControlName="username"
                                type="email">
                         <input class="form-control col-md-10 offset-1 logform"
                                placeholder="Password" type="password" formControlName="password">
-                        <button class="btn logbtn col-md-10 offset-1 btn-info my-4 btn-block" (click)="login()">Login</button>
+                        <button class="btn logbtn col-md-10 offset-1 btn-info my-4 btn-block" (click)="login()">Log In</button>
                         <p class="noaccount"><a routerLink="../registration"> Sign up here! </a></p>
                     </div>
                 </div>

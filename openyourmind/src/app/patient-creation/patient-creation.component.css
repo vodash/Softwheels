@@ -1,0 +1,9 @@
+.bluebox{
+    background-color: #5dbddf;
+    color: #fff;
+    padding: 15px;
+    margin: 15% 0;
+    -webkit-border-radius: 5%;
+    -moz-border-radius: 5%;
+    border-radius: 5%;
+}

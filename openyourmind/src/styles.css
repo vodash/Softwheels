@@ -11,14 +11,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
 .patient{
     margin-top: 25px;
     margin-bottom: 0;
-    color: #155a7d;
+    color: #5dbddf;
     font-family: 'Roboto', sans-serif;
     font-weight: 700;
     font-size: 8vh;
 }
 
 .underline{
-    border-bottom: solid 3px #86cce5;
+    border-bottom: solid 3px #000;
     margin-right: -23% !important;
 }
 

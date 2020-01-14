@@ -11,6 +11,7 @@ import {ChartData} from '../models/chartdata.model';
 
 export class ChartComponent implements OnInit {
     Chartdata: ChartData[];
+    xaxis = [];
 
     public options: any = {
         chart: {
@@ -42,16 +43,16 @@ export class ChartComponent implements OnInit {
             enabled: false
         },
         tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ''
             }
         ,
         series: [
             {
-                name: 'appel',
+                name: 'Activity',
                 data: []
             },
             {
-                name: 'peer',
+                name: 'Sleep',
                 data: []
             }
         ]}
@@ -69,12 +70,20 @@ export class ChartComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authService.GetdataonID().subscribe((data => {
+        this.authService.getDataOnID().subscribe((data => {
             this.Chartdata = data;
             console.log(this.Chartdata['hoi'][0]['data']);
             let charter = Highcharts.stockChart('container2', this.options);
             charter.series[0].setData(this.Chartdata['hoi'][0]['data']);
             charter.series[1].setData(this.Chartdata['hoi'][1]['data']);
         }));
+    }
+    // TODO: update this function to work with the new way we want to show it (with dates)
+    xAxisData(steps) {
+        console.log('clicked');
+        if (steps === 'W') {
+            this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+            console.log('hier');
+        }
     }
 }

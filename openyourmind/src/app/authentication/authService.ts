@@ -3,8 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {environment} from '../../htpp-conf';
 import {Router} from '@angular/router';
-import {Observable} from "rxjs";
-import {ChartData} from "../models/chartdata.model";
+import {ChartData} from '../models/chartdata.model';
 
 @Injectable({
     providedIn: 'root'
@@ -16,9 +15,17 @@ export class AuthService {
         console.log(username, password);
         return this.http.post(environment.adress + '/auth', {username, password}).pipe(map(user => {
             // store user details and jwt token in local storage to keep user logged in between page refreshes
-            let token = String(user['access_token']).replace(/['"]+/g, '');
+            const token = String(user['access_token']).replace(/['"]+/g, '');
             console.log(token);
             this.setStorage(token);
+        }));
+    }
+    createPatient(voornaam: string, achternaam: string, geboortedatum: string,
+                  geslacht: string, bsn: string, wachtwoord: string, email: string ) {
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.post(environment.adress + '/addpatient', {voornaam, achternaam, geboortedatum, geslacht, bsn, wachtwoord, email},
+            { headers: autorization }).pipe(map(user => {
+            console.log('als het goed is, is er nu een user.');
         }));
     }
 
@@ -29,31 +36,29 @@ export class AuthService {
         localStorage.removeItem('id_token');
     }
     isLoggedIn(): boolean {
-        if (localStorage.getItem('id_token')) {
-            return true;
-        } else {
-            return false;
-        }
+        return !!localStorage.getItem('id_token');
     }
     getStorage() {
         return localStorage.getItem('id_token');
     }
-    GetuserID() {
+    getUserID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get(environment.adress + '/protected', { headers: autorization }).pipe(map( user => {
-            console.log(user);
+        return this.http.get(environment.adress + '/isAdmin', { headers: autorization }).pipe(map( user => {
+            return user;
         }));
     }
-    GetdataonID(){
+    getPatients() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe(
-        // map( data => {
-        //     console.log(data);
-        // })
-        );
-
+        return this.http.get(environment.adress + '/patients', { headers: autorization }).pipe(map( users => {
+            return users;
+        }));
+    }
+    getDataOnID() {
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe();
     }
 
 }

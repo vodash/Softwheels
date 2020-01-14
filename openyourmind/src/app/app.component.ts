@@ -1,16 +1,23 @@
-import {Component, HostBinding, Input, Output} from '@angular/core';
-import {trigger, state, style, transition, animate} from '@angular/animations';
-import {Router} from "@angular/router";
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {AuthService} from './authentication/authService';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
     title = 'Open your mind';
-    constructor(private _router: Router) { }
+    admin;
+    constructor(private _router: Router, private authService: AuthService) { }
 
-    ngInit() {}
+    ngOnInit() {
+        this.authService.getUserID()
+            .subscribe((value) => {
+                this.admin = value;
+                console.log(this.admin);
+            });
+    }
 }
 
