@@ -12,8 +12,7 @@ export class AppComponent implements OnInit{
     admin;
     constructor(private _router: Router, private authService: AuthService) { }
 
-    ngOnInit() {}
-    checkAdmin() {
+    ngOnInit() {
         this.authService.getUserID()
             .subscribe((value) => {
                 this.admin = value;
