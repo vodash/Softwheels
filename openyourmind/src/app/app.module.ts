@@ -18,6 +18,9 @@ import {AuthGuardService} from './authentication/auth-guard.service';
 import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
 import { PatientCreationComponent } from './patient-creation/patient-creation.component';
 import { AdminMenuComponent } from './admin-menu/admin-menu.component';
+import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
+import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
+import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
 
 
 
@@ -32,7 +35,10 @@ import { AdminMenuComponent } from './admin-menu/admin-menu.component';
         PatientProfileComponent,
         PatientOverviewComponent,
         PatientCreationComponent,
-        AdminMenuComponent
+        AdminMenuComponent,
+        PasswordresetComponent,
+        UserOverviewComponent,
+        PatientListComponent
     ],
     imports: [
         BrowserModule,

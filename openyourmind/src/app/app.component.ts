@@ -15,7 +15,7 @@ export class AppComponent implements OnInit{
     ngOnInit() {
         this.authService.getUserID()
             .subscribe((value) => {
-                this.admin = value;
+                this.admin = true;
                 console.log(this.admin);
             });
     }
