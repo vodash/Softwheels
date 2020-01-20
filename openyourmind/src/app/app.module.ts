@@ -21,6 +21,7 @@ import { AdminMenuComponent } from './admin-menu/admin-menu.component';
 import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
 import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
 import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
+import { SecretaryMenuComponent } from './secretary-menu/secretary-menu.component';
 
 
 
@@ -38,7 +39,8 @@ import { PatientListComponent } from './secretary-pages/patient-list/patient-lis
         AdminMenuComponent,
         PasswordresetComponent,
         UserOverviewComponent,
-        PatientListComponent
+        PatientListComponent,
+        SecretaryMenuComponent
     ],
     imports: [
         BrowserModule,
