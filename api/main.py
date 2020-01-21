@@ -161,6 +161,23 @@ def isAdmin():
         cursor.close()
         conn.close()
 
+@application.route('/isSecretary')
+# @jwt_required()
+def isSecretary():
+    current_identity = 1
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT secretaris_id FROM professional where id=%s", str(current_identity))
+        return jsonify(cursor.fetchone()[0] == True)
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/users')
 @jwt_required()
 def users():
