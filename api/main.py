@@ -162,9 +162,8 @@ def isAdmin():
         conn.close()
 
 @application.route('/isSecretary')
-# @jwt_required()
+@jwt_required()
 def isSecretary():
-    current_identity = 1
     conn = None
     cursor = None
     try:
