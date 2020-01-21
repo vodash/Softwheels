@@ -48,6 +48,13 @@ export class AuthService {
             return user;
         }));
     }
+    getSecretary() {
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/isSecretary', { headers: autorization }).pipe(map( user => {
+            return user;
+        }));
+    }
     getPatients() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};

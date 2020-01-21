@@ -10,6 +10,7 @@ import {LoginAuthGuardService as LoginAuthGuard} from './authentication/auth-gua
 import {PatientCreationComponent} from './patient-creation/patient-creation.component';
 import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
 import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
+import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -44,6 +45,10 @@ const routes: Routes = [
     },
     {   path: 'user-overview',
         component: UserOverviewComponent
+    },
+    {
+        path: 'all-patients-list',
+        component: PatientListComponent
     }
 ];
 

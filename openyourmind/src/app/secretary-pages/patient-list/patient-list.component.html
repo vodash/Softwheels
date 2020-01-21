@@ -1,1 +1,52 @@
-<p>patient-list works!</p>
+<!--TODO : THIS SHOWS ONLY PATIENTS OF LOGGED IN THERAPIST ATM. SHOULD BE ALL PATIENTS FOR THE SECRETARY-->
+<section class="patientname">
+    <div class="container">
+        <div class="col-md-12">
+            <div class="row underline">
+                <h1 class="patient">Patients overview</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="overviewlist">
+    <div class="container-fluid">
+        <div class="col-md-10 offset-2">
+            <div class="row">
+                <div class="col-md-1 aligncenter">
+<!--                    <span class="helper"></span><img class="backforwardbtn" src="../../assets/images/backbutton.svg" alt="Back">-->
+                </div>
+                <div *ngFor="let patient of patients" class="col-md-2 aligncenter grow patientbuttons">
+                    <div routerLink="/patient" class="bluebutton patients ">
+                        <img class="col-md-12 patientimg" src="../../assets/images/ProfileIcon.svg" alt="Patient">
+                        <h2 class="optiontitle">{{ patient }}</h2>
+                    </div>
+                </div>
+                <div class="col-md-1 aligncenter">
+<!--                    <span class="helper"></span><img class="backforwardbtn rotatedarrow" src="../../assets/images/backbutton.svg" alt="Forward">-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="patientoption">
+    <div class="col-md-6 offset-6">
+        <div class="row">
+            <div class="col-md-2 buttonPositioning">
+                <div class="buttons">
+                    <button class="btn-PatientOption">Select all</button>
+                </div>
+            </div>
+            <div class="col-md-2 buttonPositioning">
+                <div class="buttons">
+                    <button class="btn-PatientOption">Reassign</button>
+                </div>
+            </div>
+            <div class="col-md-2 buttonPositioning">
+                <div class="buttons">
+                    <button class="btn-PatientOption">Switch on</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

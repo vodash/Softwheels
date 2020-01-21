@@ -25,6 +25,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
 /*style for blue button as used in patientoverview and patient profile*/
 .bluebutton{
     background: #5abcdf;
+    border-radius: 11%;
+}
+
+/*Only seventh child needs to be aligned left*/
+.patientbuttons:nth-child(5n + 7){
+    margin-left: 8.3%;
+}
+/*Top on everything from the 7th child on*/
+.patientbuttons:nth-child(n+7){
+    margin-top: 3%;
 }
 
 .aligncenter{

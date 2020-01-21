@@ -7,7 +7,7 @@ import {AuthService} from './authentication/authService';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
     title = 'Open your mind';
     admin;
     secretary;
@@ -16,9 +16,14 @@ export class AppComponent implements OnInit{
     ngOnInit() {
         this.authService.getUserID()
             .subscribe((value) => {
-                this.admin = true;  //change with 'value' after testing is done
-                this.secretary = false;
+                this.admin = value; //change with 'value' after testing is done
                 console.log(this.admin);
+            });
+            this.authService.getSecretary()
+            .subscribe((value) => {
+                //change with 'value' after testing is done
+                this.secretary = value;
+                console.log(this.secretary);
             });
     }
 }

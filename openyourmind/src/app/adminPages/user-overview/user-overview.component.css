@@ -1,0 +1,29 @@
+/*overview section*/
+.overviewlist{
+    padding-top: 10%;
+}
+
+.patients{
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 5px 5px 15px -1px rgba(0,0,0,0.35);
+    padding: 15px;
+}
+
+.patientimg{
+    padding: 0 15px;
+}
+
+.rotatedarrow{
+    -webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
+    -moz-transform: rotate(180deg);        /* FF */
+    -o-transform: rotate(180deg);          /* Opera */
+    -ms-transform: rotate(180deg);         /* IE9 */
+    transform: rotate(180deg);             /* W3C compliant browsers */
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
