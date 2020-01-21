@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
                 this.admin = value; //change with 'value' after testing is done
                 console.log(this.admin);
             });
-            this.authService.getSecretary()
+        this.authService.getSecretary()
             .subscribe((value) => {
                 //change with 'value' after testing is done
                 this.secretary = value;
