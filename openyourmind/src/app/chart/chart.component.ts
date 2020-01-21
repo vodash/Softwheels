@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
 import {AuthService} from '../authentication/authService';
 import {ChartData} from '../models/chartdata.model';
+import * as $ from 'jquery';
 
+declare var $timeout: any
 @Component({
    selector: 'app-chart',
    templateUrl: './chart.component.html',
@@ -46,6 +48,12 @@ export class ChartComponent implements OnInit {
             valueSuffix: ''
             }
         ,
+	function (chart) {
+            // apply the date pickers
+            $timeout(function () {
+                (<any>$('input.highcharts-input-group')).datepicker();
+            }, 0);
+        },
         series: [
             {
                 name: 'Activity',
