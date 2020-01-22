@@ -57,11 +57,11 @@ export class ChartComponent implements OnInit {
     //     },
         series: [
             {
-                name: 'Activity',
+                name: 'Steps',
                 data: []
             },
             {
-                name: 'Sleep',
+                name: 'Minutes Sedentary',
                 data: []
             }
         ]}
