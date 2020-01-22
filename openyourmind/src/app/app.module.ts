@@ -22,6 +22,8 @@ import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset
 import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
 import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
 import { SecretaryMenuComponent } from './secretary-menu/secretary-menu.component';
+import { TherapistsComponent } from './secretary-pages/therapists/therapists.component';
+import { TherapistPatientsListComponent } from './secretary-pages/therapist-patients-list/therapist-patients-list.component';
 
 
 
@@ -40,7 +42,9 @@ import { SecretaryMenuComponent } from './secretary-menu/secretary-menu.componen
         PasswordresetComponent,
         UserOverviewComponent,
         PatientListComponent,
-        SecretaryMenuComponent
+        SecretaryMenuComponent,
+        TherapistsComponent,
+        TherapistPatientsListComponent
     ],
     imports: [
         BrowserModule,

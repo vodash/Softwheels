@@ -11,6 +11,8 @@ import {PatientCreationComponent} from './patient-creation/patient-creation.comp
 import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
 import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
 import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
+import { TherapistsComponent } from './secretary-pages/therapists/therapists.component';
+import { TherapistPatientsListComponent } from './secretary-pages/therapist-patients-list/therapist-patients-list.component';
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -49,6 +51,14 @@ const routes: Routes = [
     {
         path: 'all-patients-list',
         component: PatientListComponent
+    },
+    {
+        path: 'all-therapists-list',
+        component: TherapistsComponent
+    },
+    {
+        path: 'therapists-patients-list',
+        component: TherapistPatientsListComponent
     }
 ];
 

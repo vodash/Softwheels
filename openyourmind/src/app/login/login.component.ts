@@ -13,7 +13,7 @@ export class LoginComponent  {
 
     form = new FormGroup({
         username: new FormControl(''),
-        password: new FormControl(''),});
+        password: new FormControl(''), });
 
     constructor(private fb: FormBuilder,
                 private authService: AuthService,
@@ -28,7 +28,7 @@ export class LoginComponent  {
                 .subscribe(
                     () => {
                         console.log("User is logged in");
-                         this.router.navigateByUrl('/profile');
+                         this.router.navigateByUrl('/patient-overview');
 
                     }
                 );
