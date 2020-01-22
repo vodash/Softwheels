@@ -121,6 +121,7 @@ def getFitbitSteps():
     conn = None
     cursor = None
     url = 'https://api.fitbit.com/1/user/-/activities/steps/date/' + start + '/' + end + '.json'
+    url2 = 'https://api.fitbit.com/1/user/-/activities/minutesSedentary/date/' + start + '/' + end + '.json'
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -128,21 +129,26 @@ def getFitbitSteps():
         access_token = getValidFitbitToken(cursor.fetchone()["access_token"], str(id))
         headers = {"Authorization": "Bearer " + access_token}
         req = requests.get(url, headers=headers)
+        req2 = requests.get(url2, headers=headers)
         out=json.loads(req.text)
-        # print(out)
+        out2=json.loads(req2.text)
         l = []
+        l2 = []
         for v in out["activities-steps"]:
             l.append(v)
+        for v in out2["activities-minutesSedentary"]:
+            l2.append(v)
 
         data = [(int(datetime.strptime(d['dateTime'], '%Y-%m-%d').strftime("%s"))*1000, int(d['value'])) for d in l]
+        data2 = [(int(datetime.strptime(d['dateTime'], '%Y-%m-%d').strftime("%s"))*1000, int(d['value'])) for d in l2]
 
         # print(data)
         message = {
             'hoi':[
                 {'name': 'Yomom',
-                 'data': (data[:20])},
+                 'data': (data)},
                 {'name': 'Isfat',
-                 'data': (data[20:])}
+                 'data': (data2)}
             ]
         }
         # print(message)
