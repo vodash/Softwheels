@@ -14,6 +14,7 @@ declare var $timeout: any
 export class ChartComponent implements OnInit {
     Chartdata: ChartData[];
     xaxis = [];
+    patientid;
 
     public options: any = {
         chart: {
@@ -78,7 +79,8 @@ export class ChartComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authService.getDataOnID().subscribe((data => {
+        this.patientid = this.authService.getPatientID();
+        this.authService.getDataOnID(this.patientid).subscribe((data => {
             this.Chartdata = data;
             console.log(this.Chartdata['hoi'][0]['data']);
             let charter = Highcharts.stockChart('container2', this.options);

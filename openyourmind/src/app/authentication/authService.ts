@@ -9,6 +9,7 @@ import {ChartData} from '../models/chartdata.model';
     providedIn: 'root'
 })
 export class AuthService {
+    patientid;
     constructor(private http: HttpClient, public reRouter: Router) {}
 
     login(username: string, password: string ) {
@@ -62,10 +63,17 @@ export class AuthService {
             return users;
         }));
     }
-    getDataOnID() {
+    getDataOnID(patientID: string) {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get<ChartData[]>(environment.adress + '/stepData?start=2019-01-05&end=2020-01-18&id=5', { headers: autorization }).pipe();
+        return this.http.get<ChartData[]>(environment.adress + '/stepData?start=2019-01-05&end=2020-01-18&id=' + patientID, { headers: autorization }).pipe();
+    }
+    setPatientID(patientid) {
+        this.patientid = patientid;
+    }
+    getPatientID() {
+        console.log(this.patientid);
+        return this.patientid;
     }
 
 }

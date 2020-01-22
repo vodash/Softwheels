@@ -39,3 +39,33 @@
 .patientButtonsMargin{
     margin-top: 4%;
 }
+
+.profilephoto{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    margin: 14% 12% 0 9%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border:solid 10px #ff6f61;
+    -webkit-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+}
+.profilepic{
+    display: inline;
+    margin: 0 auto;
+    height: auto;
+    width: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.theraText{
+    font-size: 22px;
+    margin-top: 4%;
+}
+.therapistView{
+}

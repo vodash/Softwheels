@@ -8,8 +8,7 @@ import {AuthService} from '../authentication/authService';
 })
 export class PatientOverviewComponent implements OnInit {
 
-    patients = [];
-
+    patients = [] ;
 
   constructor(private authService: AuthService) { }
 
@@ -18,11 +17,17 @@ export class PatientOverviewComponent implements OnInit {
       this.authService.getPatients()
           .subscribe((value) => {
               for (const patients in value) {
-                  this.patients.push(value[i][1]);
+                  this.patients.push({
+                      key: value[i][0],
+                      value: value[i][1]
+                  });
                   i++;
               }
            });
 
+  }
+  SendID(patientid) {
+    this.authService.setPatientID(patientid);
   }
 
 
