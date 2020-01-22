@@ -86,12 +86,12 @@ export class ChartComponent implements OnInit {
             charter.series[1].setData(this.Chartdata['hoi'][1]['data']);
         }));
     }
-    // TODO: update this function to work with the new way we want to show it (with dates)
-    xAxisData(steps) {
-        console.log('clicked');
-        if (steps === 'W') {
-            this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-            console.log('hier');
-        }
-    }
+    // // TODO: update this function to work with the new way we want to show it (with dates)
+    // xAxisData(steps) {
+    //     console.log('clicked');
+    //     if (steps === 'W') {
+    //         this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    //         console.log('hier');
+    //     }
+    // }
 }

@@ -112,6 +112,50 @@ def refresh_fitbit_token_local(id):
         cursor.close()
         conn.close()
 
+@application.route('/stepData', methods=['GET'])
+@jwt_required()
+def getFitbitSteps():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    id = request.args.get('id')
+    conn = None
+    cursor = None
+    url = 'https://api.fitbit.com/1/user/-/activities/steps/date/' + start + '/' + end + '.json'
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT access_token FROM fitbit_auth WHERE patient_id=%s", str(id))
+        access_token = getValidFitbitToken(cursor.fetchone()["access_token"], str(id))
+        headers = {"Authorization": "Bearer " + access_token}
+        req = requests.get(url, headers=headers)
+        out=json.loads(req.text)
+        # print(out)
+        l = []
+        for v in out["activities-steps"]:
+            l.append(v)
+
+        data = [(int(datetime.strptime(d['dateTime'], '%Y-%m-%d').strftime("%s"))*1000, int(d['value'])) for d in l]
+
+        # print(data)
+        message = {
+            'hoi':[
+                {'name': 'Yomom',
+                 'data': (data[:20])},
+                {'name': 'Isfat',
+                 'data': (data[20:])}
+            ]
+        }
+        # print(message)
+
+        resp = jsonify(message)
+
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/sleepData', methods=['GET'])
 @jwt_required()
 def getFitbitSleep():
@@ -120,16 +164,13 @@ def getFitbitSleep():
     id = request.args.get('id')
     conn = None
     cursor = None
-    print(start)
-    print(end)
-    print(id)
     url = 'https://api.fitbit.com/1.2/user/-/sleep/date/' + start + '/' + end + '.json'
     # url = 'https://api.fitbit.com/1.2/user/-/sleep/date/2020-01-05/2020-01-08.json'
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT access_token FROM fitbit_auth WHERE patient_id=%s", str(id))
-        access_token = getValidFitbitToken(cursor.fetchone()["access_token"])
+        access_token = getValidFitbitToken(cursor.fetchone()["access_token"], str(id))
         headers = {"Authorization": "Bearer " + access_token}
         req = requests.get(url, headers=headers)
         out=json.loads(req.text)
@@ -708,7 +749,7 @@ def getFitbitToken():
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = getValidFitbitToken(row["access_token"])
+            access_token = getValidFitbitToken(row["access_token"], user_id)
             #only send Access code.
             if len(access_token) == 260:
                 resp = jsonify(access_token)
@@ -730,7 +771,7 @@ def getFitbitToken():
         cursor.close()
         conn.close
 
-def getValidFitbitToken(access_token):
+def getValidFitbitToken(access_token, id):
     conn = None
     cursor = None
     try:
@@ -744,7 +785,7 @@ def getValidFitbitToken(access_token):
         # testDate = datetime.utcfromtimestamp(TokenExpire +10)
         # if access_token is expired, refresh
         if date < datetime.now():
-            access_token = refresh_fitbit_token_local(user_id)
+            access_token = refresh_fitbit_token_local(id)
         return(access_token)
     except Exception as e:
         print(e)

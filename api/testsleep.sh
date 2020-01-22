@@ -3,5 +3,6 @@ test=${test#'"'} #remove prefix
 test=${test%'"'} #remove suffix
 # echo $test
 # curl localhost:8000/users
-curl -H "Authorization: JWT $test" localhost:8000/sleepData?start=2020-01-05&end=2020-01-08&id=5
+# curl -H "Authorization: JWT $test" "localhost:8000/sleepData?start=2020-01-05&end=2020-01-08&id=5"
+curl -H "Authorization: JWT $test" "localhost:8000/stepData?start=2020-01-05&end=2020-01-08&id=5"
 # curl -H "Authorization: JWT $test" localhost:8000/protected

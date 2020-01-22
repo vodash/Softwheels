@@ -65,7 +65,7 @@ export class AuthService {
     getDataOnID() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe();
+        return this.http.get<ChartData[]>(environment.adress + '/stepData?start=2019-01-05&end=2020-01-18&id=5', { headers: autorization }).pipe();
     }
 
 }
