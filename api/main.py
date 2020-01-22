@@ -112,6 +112,35 @@ def refresh_fitbit_token_local(id):
         cursor.close()
         conn.close()
 
+@application.route('/sleepData', methods=['GET'])
+@jwt_required()
+def getFitbitSleep():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    id = request.args.get('id')
+    conn = None
+    cursor = None
+    print(start)
+    print(end)
+    print(id)
+    url = 'https://api.fitbit.com/1.2/user/-/sleep/date/' + start + '/' + end + '.json'
+    # url = 'https://api.fitbit.com/1.2/user/-/sleep/date/2020-01-05/2020-01-08.json'
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT access_token FROM fitbit_auth WHERE patient_id=%s", str(id))
+        access_token = getValidFitbitToken(cursor.fetchone()["access_token"])
+        headers = {"Authorization": "Bearer " + access_token}
+        req = requests.get(url, headers=headers)
+        out=json.loads(req.text)
+        print(out)
+        return "bla"
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/add', methods=['POST'])
 @jwt_required()
 def add_user():
@@ -700,6 +729,7 @@ def getFitbitToken():
     finally:
         cursor.close()
         conn.close
+
 def getValidFitbitToken(access_token):
     conn = None
     cursor = None
