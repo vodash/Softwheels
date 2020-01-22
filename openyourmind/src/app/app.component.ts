@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
         this.authService.getSecretary()
             .subscribe((value) => {
                 //change with 'value' after testing is done
-                this.secretary = value;
+                this.secretary = true;
                 console.log(this.secretary);
             });
     }
