@@ -16,7 +16,8 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         this.authService.getUserID()
             .subscribe((value) => {
-                this.admin = value; //change with 'value' after testing is done
+                //change with 'value' after testing is done (true/false)
+                this.admin = value
                 console.log(this.admin);
             });
         this.authService.getSecretary()
