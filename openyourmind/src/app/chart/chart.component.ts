@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import * as Highcharts from 'highcharts/highstock';
 import {AuthService} from '../authentication/authService';
 import {ChartData} from '../models/chartdata.model';
+// import * as $ from 'jquery';
 
+declare var $timeout: any
 @Component({
    selector: 'app-chart',
    templateUrl: './chart.component.html',
@@ -12,6 +14,7 @@ import {ChartData} from '../models/chartdata.model';
 export class ChartComponent implements OnInit {
     Chartdata: ChartData[];
     xaxis = [];
+    patientid;
 
     public options: any = {
         chart: {
@@ -46,13 +49,19 @@ export class ChartComponent implements OnInit {
             valueSuffix: ''
             }
         ,
+	// function (chart) {
+    //         // apply the date pickers
+    //         $timeout(function () {
+    //             (<any>$('input.highcharts-input-group')).datepicker();
+    //         }, 0);
+    //     },
         series: [
             {
-                name: 'Activity',
+                name: 'Steps',
                 data: []
             },
             {
-                name: 'Sleep',
+                name: 'Minutes Sedentary',
                 data: []
             }
         ]}
@@ -70,7 +79,8 @@ export class ChartComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authService.getDataOnID().subscribe((data => {
+        this.patientid = this.authService.getPatientID();
+        this.authService.getDataOnID(this.patientid).subscribe((data => {
             this.Chartdata = data;
             console.log(this.Chartdata['hoi'][0]['data']);
             let charter = Highcharts.stockChart('container2', this.options);
@@ -78,12 +88,12 @@ export class ChartComponent implements OnInit {
             charter.series[1].setData(this.Chartdata['hoi'][1]['data']);
         }));
     }
-    // TODO: update this function to work with the new way we want to show it (with dates)
-    xAxisData(steps) {
-        console.log('clicked');
-        if (steps === 'W') {
-            this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-            console.log('hier');
-        }
-    }
+    // // TODO: update this function to work with the new way we want to show it (with dates)
+    // xAxisData(steps) {
+    //     console.log('clicked');
+    //     if (steps === 'W') {
+    //         this.xaxis = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    //         console.log('hier');
+    //     }
+    // }
 }

@@ -1,9 +1,14 @@
 <!--This file holds all the content you want to show on every page. so : Menu button and banner. This also needs to import the router-outlet - kevin-->
 
 <div *ngIf="_router.url != '/'">
-    <div *ngIf="!admin; else adminMenu">
+    <div *ngIf="!admin && !secretary; else adminMenus">
         <app-menu></app-menu>
     </div>
+    <ng-template #adminMenus>
+        <div *ngIf="secretary; else adminMenu">
+            <app-secretary-menu></app-secretary-menu>
+        </div>
+    </ng-template>
     <ng-template #adminMenu>
         <app-admin-menu></app-admin-menu>
     </ng-template>

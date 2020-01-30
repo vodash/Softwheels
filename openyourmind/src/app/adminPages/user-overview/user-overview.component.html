@@ -1,0 +1,22 @@
+<!--TODO : THIS PAGE NOW SHOWS PATIENTS SHOULD BE THEREAPISTS. THIS IS JUST THE LAYOUT-->
+
+<section class="overviewlist">
+    <div class="container-fluid">
+        <div class="col-md-10 offset-2">
+            <div class="row">
+                <div class="col-md-1 aligncenter">
+<!--                    <span class="helper"></span><img class="backforwardbtn" src="../../assets/images/backbutton.svg" alt="Back">-->
+                </div>
+                <div *ngFor="let patient of patients" class="col-md-2 aligncenter grow patientbuttons">
+                    <div routerLink="/chart" class="bluebutton patients">
+                        <img class="col-md-12 patientimg" src="../../assets/images/ProfileIcon.svg" alt="Patient">
+                        <h2 class="optiontitle">{{ patient }}</h2>
+                    </div>
+                </div>
+<!--                <div class="col-md-1 aligncenter">-->
+<!--                    <span class="helper"></span><img class="backforwardbtn rotatedarrow" src="../../assets/images/backbutton.svg" alt="Forward">-->
+<!--                </div>-->
+            </div>
+        </div>
+    </div>
+</section>

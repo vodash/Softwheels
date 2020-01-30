@@ -9,6 +9,7 @@ import {ChartData} from '../models/chartdata.model';
     providedIn: 'root'
 })
 export class AuthService {
+    patientid;
     constructor(private http: HttpClient, public reRouter: Router) {}
 
     login(username: string, password: string ) {
@@ -48,6 +49,13 @@ export class AuthService {
             return user;
         }));
     }
+    getSecretary() {
+        console.log(this.getStorage());
+        const autorization = {Authorization: 'JWT ' + this.getStorage()};
+        return this.http.get(environment.adress + '/isSecretary', { headers: autorization }).pipe(map( user => {
+            return user;
+        }));
+    }
     getPatients() {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
@@ -55,10 +63,17 @@ export class AuthService {
             return users;
         }));
     }
-    getDataOnID() {
+    getDataOnID(patientID: string) {
         console.log(this.getStorage());
         const autorization = {Authorization: 'JWT ' + this.getStorage()};
-        return this.http.get<ChartData[]>(environment.adress + '/fake', { headers: autorization }).pipe();
+        return this.http.get<ChartData[]>(environment.adress + '/stepData?start=2019-01-05&end=2020-01-18&id=' + patientID, { headers: autorization }).pipe();
+    }
+    setPatientID(patientid) {
+        this.patientid = patientid;
+    }
+    getPatientID() {
+        console.log(this.patientid);
+        return this.patientid;
     }
 
 }

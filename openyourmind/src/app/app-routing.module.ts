@@ -7,7 +7,12 @@ import {PatientProfileComponent} from './patient-profile/patient-profile.compone
 import {PatientOverviewComponent} from './patient-overview/patient-overview.component';
 import {AuthGuardService as AuthGuard} from './authentication/auth-guard.service';
 import {LoginAuthGuardService as LoginAuthGuard} from './authentication/auth-guard-login.service';
-import {PatientCreationComponent} from "./patient-creation/patient-creation.component";
+import {PatientCreationComponent} from './patient-creation/patient-creation.component';
+import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
+import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
+import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
+import { TherapistsComponent } from './secretary-pages/therapists/therapists.component';
+import { TherapistPatientsListComponent } from './secretary-pages/therapist-patients-list/therapist-patients-list.component';
 
 // router module for navigation in the web app
 const routes: Routes = [
@@ -36,6 +41,24 @@ const routes: Routes = [
     {
         path: 'patient-creation',
         component: PatientCreationComponent
+    },
+    {   path: 'reset-password',
+        component: PasswordresetComponent
+    },
+    {   path: 'user-overview',
+        component: UserOverviewComponent
+    },
+    {
+        path: 'all-patients-list',
+        component: PatientListComponent
+    },
+    {
+        path: 'all-therapists-list',
+        component: TherapistsComponent
+    },
+    {
+        path: 'therapists-patients-list',
+        component: TherapistPatientsListComponent
     }
 ];
 

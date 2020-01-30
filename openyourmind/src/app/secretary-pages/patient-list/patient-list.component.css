@@ -27,3 +27,15 @@
     height: 100%;
     vertical-align: middle;
 }
+
+.btn-PatientOption{
+    color: #fff;
+    background-color: #5abcdf;
+    padding: 15px 20px;
+    border-radius: 14%;
+    font-size: 19px;
+    border: none;
+}
+.patientButtonsMargin{
+    margin-top: 4%;
+}

@@ -112,6 +112,82 @@ def refresh_fitbit_token_local(id):
         cursor.close()
         conn.close()
 
+@application.route('/stepData', methods=['GET'])
+@jwt_required()
+def getFitbitSteps():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    id = request.args.get('id')
+    conn = None
+    cursor = None
+    url = 'https://api.fitbit.com/1/user/-/activities/steps/date/' + start + '/' + end + '.json'
+    url2 = 'https://api.fitbit.com/1/user/-/activities/minutesSedentary/date/' + start + '/' + end + '.json'
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT access_token FROM fitbit_auth WHERE patient_id=%s", str(id))
+        access_token = getValidFitbitToken(cursor.fetchone()["access_token"], str(id))
+        headers = {"Authorization": "Bearer " + access_token}
+        req = requests.get(url, headers=headers)
+        req2 = requests.get(url2, headers=headers)
+        out=json.loads(req.text)
+        out2=json.loads(req2.text)
+        l = []
+        l2 = []
+        for v in out["activities-steps"]:
+            l.append(v)
+        for v in out2["activities-minutesSedentary"]:
+            l2.append(v)
+
+        data = [(int(datetime.strptime(d['dateTime'], '%Y-%m-%d').strftime("%s"))*1000, int(d['value'])) for d in l]
+        data2 = [(int(datetime.strptime(d['dateTime'], '%Y-%m-%d').strftime("%s"))*1000, int(d['value'])) for d in l2]
+
+        # print(data)
+        message = {
+            'hoi':[
+                {'name': 'Yomom',
+                 'data': (data)},
+                {'name': 'Isfat',
+                 'data': (data2)}
+            ]
+        }
+        # print(message)
+
+        resp = jsonify(message)
+
+        return resp
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/sleepData', methods=['GET'])
+@jwt_required()
+def getFitbitSleep():
+    start = request.args.get('start')
+    end = request.args.get('end')
+    id = request.args.get('id')
+    conn = None
+    cursor = None
+    url = 'https://api.fitbit.com/1.2/user/-/sleep/date/' + start + '/' + end + '.json'
+    # url = 'https://api.fitbit.com/1.2/user/-/sleep/date/2020-01-05/2020-01-08.json'
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT access_token FROM fitbit_auth WHERE patient_id=%s", str(id))
+        access_token = getValidFitbitToken(cursor.fetchone()["access_token"], str(id))
+        headers = {"Authorization": "Bearer " + access_token}
+        req = requests.get(url, headers=headers)
+        out=json.loads(req.text)
+        print(out)
+        return "bla"
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
 @application.route('/add', methods=['POST'])
 @jwt_required()
 def add_user():
@@ -154,7 +230,25 @@ def isAdmin():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
-        return jsonify(cursor.fetchone()[0] == True)
+        # return jsonify(cursor.fetchone()[0] == True)
+        return str(cursor.fetchone()[0])
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@application.route('/isSecretary')
+@jwt_required()
+def isSecretary():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT secretaris_id FROM professional where id=%s", str(current_identity))
+        # return jsonify(cursor.fetchone()[0] == True)
+        return str(cursor.fetchone()[0])
     except Exception as e:
         print(e)
     finally:
@@ -663,7 +757,7 @@ def getFitbitToken():
             data = (user_id)
             cursor.execute(sql, data)
             row = cursor.fetchone()
-            access_token = getValidFitbitToken(row["access_token"])
+            access_token = getValidFitbitToken(row["access_token"], user_id)
             #only send Access code.
             if len(access_token) == 260:
                 resp = jsonify(access_token)
@@ -684,7 +778,8 @@ def getFitbitToken():
     finally:
         cursor.close()
         conn.close
-def getValidFitbitToken(access_token):
+
+def getValidFitbitToken(access_token, id):
     conn = None
     cursor = None
     try:
@@ -698,7 +793,7 @@ def getValidFitbitToken(access_token):
         # testDate = datetime.utcfromtimestamp(TokenExpire +10)
         # if access_token is expired, refresh
         if date < datetime.now():
-            access_token = refresh_fitbit_token_local(user_id)
+            access_token = refresh_fitbit_token_local(id)
         return(access_token)
     except Exception as e:
         print(e)

@@ -18,6 +18,12 @@ import {AuthGuardService} from './authentication/auth-guard.service';
 import {LoginAuthGuardService} from "./authentication/auth-guard-login.service";
 import { PatientCreationComponent } from './patient-creation/patient-creation.component';
 import { AdminMenuComponent } from './admin-menu/admin-menu.component';
+import { PasswordresetComponent } from './adminPages/passwordreset/passwordreset.component';
+import { UserOverviewComponent } from './adminPages/user-overview/user-overview.component';
+import { PatientListComponent } from './secretary-pages/patient-list/patient-list.component';
+import { SecretaryMenuComponent } from './secretary-menu/secretary-menu.component';
+import { TherapistsComponent } from './secretary-pages/therapists/therapists.component';
+import { TherapistPatientsListComponent } from './secretary-pages/therapist-patients-list/therapist-patients-list.component';
 
 
 
@@ -32,7 +38,13 @@ import { AdminMenuComponent } from './admin-menu/admin-menu.component';
         PatientProfileComponent,
         PatientOverviewComponent,
         PatientCreationComponent,
-        AdminMenuComponent
+        AdminMenuComponent,
+        PasswordresetComponent,
+        UserOverviewComponent,
+        PatientListComponent,
+        SecretaryMenuComponent,
+        TherapistsComponent,
+        TherapistPatientsListComponent
     ],
     imports: [
         BrowserModule,

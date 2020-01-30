@@ -1,0 +1,71 @@
+/*overview section*/
+.overviewlist{
+    padding-top: 7%;
+}
+
+.patients{
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 5px 5px 15px -1px rgba(0,0,0,0.35);
+    padding: 15px;
+}
+
+.patientimg{
+    padding: 0 15px;
+}
+
+.rotatedarrow{
+    -webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
+    -moz-transform: rotate(180deg);        /* FF */
+    -o-transform: rotate(180deg);          /* Opera */
+    -ms-transform: rotate(180deg);         /* IE9 */
+    transform: rotate(180deg);             /* W3C compliant browsers */
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.btn-PatientOption{
+    color: #fff;
+    background-color: #5abcdf;
+    padding: 15px 20px;
+    border-radius: 14%;
+    font-size: 19px;
+    border: none;
+}
+.patientButtonsMargin{
+    margin-top: 4%;
+}
+
+.profilephoto{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    margin: 14% 12% 0 9%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border:solid 10px #ff6f61;
+    -webkit-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 22px -1px rgba(0,0,0,0.75);
+}
+.profilepic{
+    display: inline;
+    margin: 0 auto;
+    height: auto;
+    width: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.theraText{
+    font-size: 22px;
+    margin-top: 4%;
+}
+.therapistView{
+}
