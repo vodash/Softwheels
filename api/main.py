@@ -230,7 +230,8 @@ def isAdmin():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("SELECT admin_id FROM professional where id=%s", str(current_identity))
-        return jsonify(cursor.fetchone()[0] == True)
+        # return jsonify(cursor.fetchone()[0] == True)
+        return str(cursor.fetchone()[0])
     except Exception as e:
         print(e)
     finally:
@@ -246,7 +247,8 @@ def isSecretary():
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("SELECT secretaris_id FROM professional where id=%s", str(current_identity))
-        return jsonify(cursor.fetchone()[0] == True)
+        # return jsonify(cursor.fetchone()[0] == True)
+        return str(cursor.fetchone()[0])
     except Exception as e:
         print(e)
     finally:
